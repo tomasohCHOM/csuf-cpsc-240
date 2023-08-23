@@ -1,0 +1,363 @@
+     1                                  ;****************************************************************************************************************************
+     2                                  ;Program name: "Basic Float Operations".  This program demonstrates the input and output of a float number and demonstrates *
+     3                                  ;some basic math operations using float numbers.  Copyright (C) 2020 Floyd Holliday.                                        *
+     4                                  ;                                                                                                                           *
+     5                                  ;This file is part of the software program "Basic Float Operations".                                                        *
+     6                                  ;Basic Float Operations is free software: you can redistribute it and/or modify it under the terms of the GNU General Public*
+     7                                  ;License version 3 as published by the Free Software Foundation.                                                            *
+     8                                  ;Basic Float Operations is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the       *
+     9                                  ;implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more      *
+    10                                  ;details.  A copy of the GNU General Public License v3 is available here:  <https:;www.gnu.org/licenses/>.                  *
+    11                                  ;****************************************************************************************************************************
+    12                                  
+    13                                  ;========1=========2=========3=========4=========5=========6=========7=========8=========9=========0=========1=========2=========3**
+    14                                  ;
+    15                                  ;Author information
+    16                                  ;  Author name: Floyd Holliday
+    17                                  ;  Author email: holliday@fullerton.edu
+    18                                  ;
+    19                                  ;Program information
+    20                                  ;  Program name: Basic Float Operations
+    21                                  ;  Programming languages: One modules in C++ and one module in X86
+    22                                  ;  Date program began: 2014-Aug-25
+    23                                  ;  Date of last update: 2014-Sep-29
+    24                                  ;  Date comments upgraded: 2020-July-04
+    25                                  ;  Date open source license added: 2020-Sep-20
+    26                                  ;  Files in this program: fp-io-driver.cpp, fp-io.asm 
+    27                                  ;  Status: Finished.
+    28                                  ;  References consulted: Seyfarth, Chapter 11
+    29                                  ;  Future upgrade possible: software to validate inputs and reject non-float inputs
+    30                                  ;
+    31                                  ;Purpose
+    32                                  ;  This program will demonstrate how to input a single float number, multiply that inputted number by a floating point
+    33                                  ;  constant and then output the results.
+    34                                  ;  To students enrolled in 240 class: this program includes a secondary purpose, which is to demonstrate how to do a 
+    35                                  ;     state component back up using instructions xsave and xrstor.  For the most part that is superflous material. You may
+    36                                  ;     safely disregard the two sections on "state component backup".  By the way, you still have to save all the GPRs 
+    37                                  ;     and restore them the long way.
+    38                                  ;
+    39                                  ;This file
+    40                                  ;  File name: fp-io.asm
+    41                                  ;  Language: X86 with Intel syntax.
+    42                                  ;  Max page width: 132 columns
+    43                                  ;  Assemble: nasm -f elf64 -l fp-io.lis -o fp-io.o fp-io.asm
+    44                                  
+    45                                  
+    46                                  ;===== Begin code area ========================================================================================================
+    47                                  
+    48                                  extern printf                                               ;External C++ function for writing to standard output device
+    49                                  
+    50                                  extern scanf                                                ;External C++ function for reading from the standard input device
+    51                                  
+    52                                  global floating_point_io                                    ;This makes floating_point_io callable by functions outside of this file.
+    53                                  
+    54                                  three_point_zero equ 0x4008000000000000                     ;Use the hex expression for 64-bit floating point 3.0
+    55                                  
+    56                                  segment .data                                               ;Place initialized data here
+    57                                  
+    58                                  ;===== Declare some messages ==================================================================================================
+    59                                  
+    60 00000000 546869732058383620-     initialmessage db "This X86 program will demonstrate the input and output of 8-byte floating point numbers.", 10, 0
+    60 00000009 70726F6772616D2077-
+    60 00000012 696C6C2064656D6F6E-
+    60 0000001B 737472617465207468-
+    60 00000024 6520696E7075742061-
+    60 0000002D 6E64206F7574707574-
+    60 00000036 206F6620382D627974-
+    60 0000003F 6520666C6F6174696E-
+    60 00000048 6720706F696E74206E-
+    60 00000051 756D626572732E0A00 
+    61                                  
+    62 0000005A 456E74657220612066-     promptmessage db "Enter a floating point number in base 10: ", 0
+    62 00000063 6C6F6174696E672070-
+    62 0000006C 6F696E74206E756D62-
+    62 00000075 657220696E20626173-
+    62 0000007E 652031303A2000     
+    63                                  
+    64 00000085 5468652076616C7565-     outputmessage db "The value of %1.18lf divided by %1.18lf is %1.18lf", 10, 0
+    64 0000008E 206F662025312E3138-
+    64 00000097 6C6620646976696465-
+    64 000000A0 642062792025312E31-
+    64 000000A9 386C66206973202531-
+    64 000000B2 2E31386C660A00     
+    65                                  
+    66 000000B9 546865207873617665-     xsavenotsupported.notsupportedmessage db "The xsave instruction and the xrstor instruction are not supported in this microprocessor.", 10
+    66 000000C2 20696E737472756374-
+    66 000000CB 696F6E20616E642074-
+    66 000000D4 686520787273746F72-
+    66 000000DD 20696E737472756374-
+    66 000000E6 696F6E20617265206E-
+    66 000000EF 6F7420737570706F72-
+    66 000000F8 74656420696E207468-
+    66 00000101 6973206D6963726F70-
+    66 0000010A 726F636573736F722E-
+    66 00000113 0A                 
+    67 00000114 486F77657665722C20-                                           db "However, processing will continue without backing up state component data", 10, 0
+    67 0000011D 70726F63657373696E-
+    67 00000126 672077696C6C20636F-
+    67 0000012F 6E74696E7565207769-
+    67 00000138 74686F757420626163-
+    67 00000141 6B696E672075702073-
+    67 0000014A 7461746520636F6D70-
+    67 00000153 6F6E656E7420646174-
+    67 0000015C 610A00             
+    68                                  
+    69 0000015F 4920686F706520796F-     goodbye db "I hope you like working with 8-byte floating points numbers.",10
+    69 00000168 75206C696B6520776F-
+    69 00000171 726B696E6720776974-
+    69 0000017A 6820382D6279746520-
+    69 00000183 666C6F6174696E6720-
+    69 0000018C 706F696E7473206E75-
+    69 00000195 6D626572732E0A     
+    70 0000019C 382D62797465206E75-             db "8-byte numbers have the highest precision available in an 8-byte (64-bit) microprocessor.",10,0
+    70 000001A5 6D6265727320686176-
+    70 000001AE 652074686520686967-
+    70 000001B7 686573742070726563-
+    70 000001C0 6973696F6E20617661-
+    70 000001C9 696C61626C6520696E-
+    70 000001D2 20616E20382D627974-
+    70 000001DB 65202836342D626974-
+    70 000001E4 29206D6963726F7072-
+    70 000001ED 6F636573736F722E0A-
+    70 000001F6 00                 
+    71                                  
+    72 000001F7 257300                  stringformat db "%s", 0                                     ;general string format
+    73                                  
+    74 000001FA 257300                  xsavenotsupported.stringformat db "%s", 0
+    75                                  
+    76 000001FD 256C6600                eight_byte_format db "%lf", 0                               ;general 8-byte float format
+    77                                  
+    78                                  segment .bss                                                ;Place un-initialized data here.
+    79                                  
+    80                                  align 64                                                    ;Insure that the inext data declaration starts on a 64-byte boundar.
+    81 00000000 <res 340h>              backuparea resb 832                                         ;Create an array for backup storage having 832 bytes.
+    82                                  
+    83                                  ;===== Begin executable instructions here =====================================================================================
+    84                                  
+    85                                  segment .text                                               ;Place executable instructions in this segment.
+    86                                  
+    87                                  floating_point_io:                                          ;Entry point.  Execution begins here.
+    88                                  
+    89                                  ;=========== Back up all the GPRs whether used in this program or not =========================================================
+    90                                  
+    91 00000000 55                      push       rbp                                              ;Save a copy of the stack base pointer
+    92 00000001 4889E5                  mov        rbp, rsp                                         ;We do this in order to be 100% compatible with C and C++.
+    93 00000004 53                      push       rbx                                              ;Back up rbx
+    94 00000005 51                      push       rcx                                              ;Back up rcx
+    95 00000006 52                      push       rdx                                              ;Back up rdx
+    96 00000007 56                      push       rsi                                              ;Back up rsi
+    97 00000008 57                      push       rdi                                              ;Back up rdi
+    98 00000009 4150                    push       r8                                               ;Back up r8
+    99 0000000B 4151                    push       r9                                               ;Back up r9
+   100 0000000D 4152                    push       r10                                              ;Back up r10
+   101 0000000F 4153                    push       r11                                              ;Back up r11
+   102 00000011 4154                    push       r12                                              ;Back up r12
+   103 00000013 4155                    push       r13                                              ;Back up r13
+   104 00000015 4156                    push       r14                                              ;Back up r14
+   105 00000017 4157                    push       r15                                              ;Back up r15
+   106 00000019 9C                      pushf                                                       ;Back up rflags
+   107                                  
+   108                                  
+   109                                  ;==============================================================================================================================
+   110                                  ;===== Begin State Component Backup ===========================================================================================
+   111                                  ;==============================================================================================================================
+   112                                  
+   113                                  ;=========== Before proceeding verify that this computer supports xsave and xrstor ============================================
+   114                                  ;Bit #26 of rcx, written rcx[26], must be 1; otherwise xsave and xrstor are not supported by this computer.
+   115                                  ;Preconditions: rax holds 1.
+   116 0000001A B801000000              mov        rax, 1
+   117                                  
+   118                                  ;Execute the cpuid instruction
+   119 0000001F 0FA2                    cpuid
+   120                                  
+   121                                  ;Postconditions: If rcx[26]==1 then xsave is supported.  If rcx[26]==0 then xsave is not supported.
+   122                                  
+   123                                  ;=========== Extract bit #26 and test it ======================================================================================
+   124                                  
+   125 00000021 4881E100000004          and        rcx, 0x0000000004000000                          ;The mask 0x0000000004000000 has a 1 in position #26.  Now rcx is either all zeros or
+   126                                                                                              ;has a single 1 in position #26 and zeros everywhere else.
+   127 00000028 4883F900                cmp        rcx, 0                                           ;Is (rcx == 0)?
+   128 0000002C 742A                    je         xsavenotsupported                                ;Skip the section that backs up state component data.
+   129                                  
+   130                                  ;========== Call the function to obtain the bitmap of state components ========================================================
+   131                                  
+   132                                  ;Preconditions
+   133 0000002E B80D000000              mov        rax, 0x000000000000000d                          ;Place 13 in rax.  This number is provided in the Intel manual
+   134 00000033 B900000000              mov        rcx, 0                                           ;0 is parameter for subfunction 0
+   135                                  
+   136                                  ;Call the function
+   137 00000038 0FA2                    cpuid                                                       ;cpuid is an essential function that returns information about the cpu
+   138                                  
+   139                                  ;Postconditions (There are 2 of these):
+   140                                  
+   141                                  ;1.  edx:eax is a bit map of state components managed by xsave.  At the time this program was written (2014 June) there were exactly 3 state components.  Therefore, bits
+   142                                  ;    numbered 2, 1, and 0 are important for current cpu technology.
+   143                                  ;2.  ecx holds the number of bytes required to store all the data of enabled state components. [Post condition 2 is not used in this program.]
+   144                                  ;This program assumes that under current technology (year 2014) there are at most three state components having a maximum combined data storage requirement of 832 bytes.
+   145                                  ;Therefore, the value in ecx will be less than or equal to 832.
+   146                                  
+   147                                  ;Precaution: As an insurance against a future time when there will be more than 3 state components in a processor of the X86 family the state component bitmap is masked to
+   148                                  ;allow only 3 state components maximum.
+   149                                  
+   150 0000003A 41BF07000000            mov        r15, 7                                           ;7 equals three 1 bits.
+   151 00000040 4C21F8                  and        rax, r15                                         ;Bits 63-3 become zeros.
+   152 00000043 41BF00000000            mov        r15, 0                                           ;0 equals 64 binary zeros.
+   153 00000049 4C21FA                  and        rdx, r15                                         ;Zero out rdx.
+   154                                  
+   155                                  ;========== Save all the data of all three components except GPRs =============================================================
+   156                                  
+   157                                  ;The instruction xsave will save those state components with on bits in the bitmap.  At this point edx:eax continues to hold the state component bitmap.
+   158                                  
+   159                                  ;Precondition: edx:eax holds the state component bit map.  This condition has been met by the two pops preceding this statement.
+   160 0000004C 0FAE2425[00000000]      xsave      [backuparea]                                     ;All the data of state components managed by xsave have been written to backuparea.
+   161                                  
+   162 00000054 6AFF                    push qword -1                                               ;Set a flag (-1 = true) to indicate that state component data were backed up.
+   163 00000056 EB20                    jmp        startapplication
+   164                                  
+   165                                  ;========== Show message xsave is not supported on this platform ==============================================================
+   166                                  xsavenotsupported:
+   167                                  
+   168 00000058 B800000000              mov        rax, 0
+   169 0000005D 48BF-                   mov        rdi, .stringformat
+   169 0000005F [FA01000000000000] 
+   170 00000067 48BE-                   mov        rsi, .notsupportedmessage                        ;"The xsave instruction is not suported in this microprocessor.
+   170 00000069 [B900000000000000] 
+   171 00000071 E8(00000000)            call       printf
+   172                                  
+   173 00000076 6A00                    push qword 0                                                ;Set a flag (0 = false) to indicate that state component data were not backed up.
+   174                                  
+   175                                  ;==============================================================================================================================
+   176                                  ;===== End of State Component Backup ==========================================================================================
+   177                                  ;==============================================================================================================================
+   178                                  
+   179                                  
+   180                                  ;==============================================================================================================================
+   181                                  startapplication: ;===== Begin the application here: demonstrate floating point i/o ===========================================
+   182                                  ;==============================================================================================================================
+   183                                  
+   184                                  ;Show the initial message
+   185 00000078 6A00                    push qword 0                                                ;Get onto the 16-byte boundary
+   186 0000007A B800000000              mov qword  rax, 0                                           ;No data from SSE will be printed
+   187 0000007F 48BF-                   mov        rdi, stringformat                                ;"%s"
+   187 00000081 [F701000000000000] 
+   188 00000089 48BE-                   mov        rsi, initialmessage                              ;"This X86 program will demonstrate the input and output of 8-byte ... "
+   188 0000008B [0000000000000000] 
+   189 00000093 E8(00000000)            call       printf                                           ;Call a library function to make the output
+   190                                  
+   191                                  
+   192                                  ;Prompt for floating point number
+   193 00000098 B800000000              mov qword  rax, 0                                           ;No data from SSE will be printed
+   194 0000009D 48BF-                   mov        rdi, stringformat                                ;"%s"
+   194 0000009F [F701000000000000] 
+   195 000000A7 48BE-                   mov        rsi, promptmessage                               ;"Enter a floating point number in base 10: "
+   195 000000A9 [5A00000000000000] 
+   196 000000B1 E8(00000000)            call       printf                                           ;Call a library function to make the output
+   197 000000B6 58                      pop rax                                                     ;Reverse an earlier push
+   198                                  
+   199                                  
+   200                                  ;Obtain a floating point number from the standard input device and store a copy in xmm0
+   201 000000B7 6A00                    push qword 0                                                ;Reserve 8 bytes of storage for the incoming number
+   202 000000B9 B800000000              mov qword  rax, 0                                           ;SSE is not involved in this scanf operation
+   203 000000BE 48BF-                   mov        rdi, eight_byte_format                           ;"%lf"
+   203 000000C0 [FD01000000000000] 
+   204 000000C8 4889E6                  mov        rsi, rsp                                         ;Give scanf a point to the reserved storage
+   205 000000CB E8(00000000)            call       scanf                                            ;Call a library function to do the input work
+   206 000000D0 F20F100424              movsd      xmm0, [rsp]                                      ;Copy the inputted number to xmm0
+   207 000000D5 58                      pop        rax                                              ;Make free the storage that was used by scanf
+   208                                  
+   209                                  ;Divide the inputted number by a constant
+   210 000000D6 F20F10D0                movsd      xmm2, xmm0                                       ;There are 2 copies of the inputted number: xmm0 and xmm2
+   211 000000DA 48BB00000000000008-     mov        rbx, three_point_zero                            ;3.0 is placed in rbx, and is ready to be pushed on the stack.
+   211 000000E3 40                 
+   212 000000E4 53                      push       rbx                                              ;Place the constant on the integer stack
+   213 000000E5 F20F5E1424              divsd      xmm2, [rsp]                                      ;Divide the input number by the constant
+   214 000000EA F20F100C24              movsd      xmm1, [rsp]                                      ;Copy the divisor to xmm1
+   215 000000EF 58                      pop        rax                                              ;Discard the divisor from the integer stack
+   216                                  
+   217                                  ;Save a copy of the quotient before calling printf
+   218 000000F0 6A00                    push qword 0                                                ;Reserve 8 bytes of storage
+   219 000000F2 F20F111424              movsd      [rsp], xmm2                                      ;Place a backup copy of the quotient in the reserved storage
+   220                                  
+   221                                  ;Show the result of the division operation
+   222 000000F7 B803000000              mov        rax, 3                                           ;3 floating point numbers will be outputted
+   223 000000FC 48BF-                   mov        rdi, outputmessage                               ;"The value of %1.18lf divided by %1.18lf is %1.18lf"
+   223 000000FE [8500000000000000] 
+   224 00000106 E8(00000000)            call       printf                                           ;Call a library function to do the hard work
+   225                                  
+   226                                  ;Output the concluding message
+   227 0000010B B800000000              mov qword  rax, 0                                           ;No data from SSE will be printed
+   228 00000110 48BF-                   mov        rdi, stringformat                                ;"%s"
+   228 00000112 [F701000000000000] 
+   229 0000011A 48BE-                   mov        rsi, goodbye                                     ;"This summation program will now return to the driver.  Have a nice day."
+   229 0000011C [5F01000000000000] 
+   230 00000124 E8(00000000)            call       printf                                           ;Call a llibrary function to do the hard work.
+   231                                  
+   232                                  
+   233                                  ;===== Retrieve a copy of the quotient that was backed up earlier =============================================================
+   234                                  
+   235 00000129 415E                    pop        r14                                              ;A copy of the quotient is in r14 (temporary storage)
+   236                                  
+   237                                  ;Now the stack is in the same state as when the application area was entered.  It is safe to leave this application area.
+   238                                  
+   239                                  
+   240                                  ;==============================================================================================================================
+   241                                  ;===== Begin State Component Restore ==========================================================================================
+   242                                  ;==============================================================================================================================
+   243                                  
+   244                                  ;Check the flag to determine if state components were really backed up
+   245 0000012B 5B                      pop        rbx                                              ;Obtain a copy of the flag that indicates state component backup or not.
+   246 0000012C 4883FB00                cmp        rbx, 0                                           ;If there was no backup of state components then jump past the restore section.
+   247 00000130 7426                    je         setreturnvalue                                   ;Go to set up the return value.
+   248                                  
+   249                                  ;Continue with restoration of state components;
+   250                                  
+   251                                  ;Precondition: edx:eax must hold the state component bitmap.  Therefore, go get a new copy of that bitmap.
+   252                                  
+   253                                  ;Preconditions for obtaining the bitmap from the cpuid instruction
+   254 00000132 B80D000000              mov        rax, 0x000000000000000d                          ;Place 13 in rax.  This number is provided in the Intel manual
+   255 00000137 B900000000              mov        rcx, 0                                           ;0 is parameter for subfunction 0
+   256                                  
+   257                                  ;Call the function
+   258 0000013C 0FA2                    cpuid                                                       ;cpuid is an essential function that returns information about the cpu
+   259                                  
+   260                                  ;Postcondition: The bitmap in now in edx:eax
+   261                                  
+   262                                  ;Future insurance: Make sure the bitmap is limited to a maximum of 3 state components.
+   263 0000013E 41BF07000000            mov        r15, 7
+   264 00000144 4C21F8                  and        rax, r15
+   265 00000147 41BF00000000            mov        r15, 0
+   266 0000014D 4C21FA                  and        rdx, r15
+   267                                  
+   268 00000150 0FAE2C25[00000000]      xrstor     [backuparea]
+   269                                  
+   270                                  ;==============================================================================================================================
+   271                                  ;===== End State Component Restore ============================================================================================
+   272                                  ;==============================================================================================================================
+   273                                  
+   274                                  
+   275                                  setreturnvalue:
+   276 00000158 4156                    push       r14                                              ;r14 continues to hold the first computed floating point value.
+   277 0000015A F20F100424              movsd      xmm0, [rsp]                                      ;That first computed floating point value is copied to xmm0[63-0]
+   278 0000015F 415E                    pop        r14                                              ;Reverse the push of two lines earlier.
+   279                                  
+   280                                  ;Restore the original values to the GPRs
+   281 00000161 9D                      popf                                                        ;Restore rflags
+   282 00000162 415F                    pop        r15                                              ;Restore r15
+   283 00000164 415E                    pop        r14                                              ;Restore r14
+   284 00000166 415D                    pop        r13                                              ;Restore r13
+   285 00000168 415C                    pop        r12                                              ;Restore r12
+   286 0000016A 415B                    pop        r11                                              ;Restore r11
+   287 0000016C 415A                    pop        r10                                              ;Restore r10
+   288 0000016E 4159                    pop        r9                                               ;Restore r9
+   289 00000170 4158                    pop        r8                                               ;Restore r8
+   290 00000172 5F                      pop        rdi                                              ;Restore rdi
+   291 00000173 5E                      pop        rsi                                              ;Restore rsi
+   292 00000174 5A                      pop        rdx                                              ;Restore rdx
+   293 00000175 59                      pop        rcx                                              ;Restore rcx
+   294 00000176 5B                      pop        rbx                                              ;Restore rbx
+   295 00000177 5D                      pop        rbp                                              ;Restore rbp
+   296                                  
+   297 00000178 C3                      ret                                                         ;No parameter with this instruction.  This instruction will pop 8 bytes from
+   298                                                                                              ;the integer stack, and jump to the address found on the stack.
+   299                                  ;========== End of program fp-io.asm ======================================================================================================================================
+   300                                  ;========1=========2=========3=========4=========5=========6=========7=========8=========9=========0=========1=========2=========3=========4=========5=========6=========7**
