@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-#Author: Floyd Holliday
+#Author: Tomas Oh
 #Program name: Basic Float Operations
 
 rm *.o
@@ -9,16 +9,16 @@ rm *.out
 
 echo "This is program <Demonstrate Numeric IO>"
 
-echo "Assemble the module main.asm"
-nasm -f elf64 -l main.lis -o main.o main.asm
+echo "Assemble the module lasvegas.asm"
+nasm -f elf64 -l lasvegas.lis -o lasvegas.o lasvegas.asm
 
-echo "Compile the C++ module main-driver.cpp"
-g++ -c -m64 -Wall -o main-driver.o main-driver.cpp -fno-pie -no-pie -std=c++17
+echo "Compile the C++ module lasvegas-driver.cpp"
+g++ -c -m64 -Wall -o lasvegas-driver.o lasvegas-driver.cpp -fno-pie -no-pie -std=c++17
 
 echo "Link the two object files already created"
-g++ -m64 -o main.out main-driver.o main.o -fno-pie -no-pie -std=c++17
+g++ -m64 -o lasvegas.out lasvegas-driver.o lasvegas.o -fno-pie -no-pie -std=c++17
 
 echo "Run the program Basic Float Operations"
-./main.out
+./lasvegas.out
 
 echo "The bash script file is now closing."
