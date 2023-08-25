@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-#Author: Floyd Holliday
+#Author: Tomas Oh
 #Program name: Basic Float Operations
 
 rm *.o
