@@ -8,11 +8,11 @@ global lasvegas
 
 segment .data
     ; Declare some messages to the users
-    initialspeedpromptmessage   db  "Please enter the speed for the intial segment of the trip (mph): ", 0
-    milespromptmessage          db  "For how many miles will you maintain this average speed? ", 0
-    finalspeedpromptmessage     db  "What will be your speed during the final segment of the trip (mph)? ", 0
-    averagespeedmessage         db  "Your average speed will be %1.18lf", 0
-    totaltimemessage            db  "the total travel time will be %1.18lf", 0
+    initial_speed_prompt_message    db  "Please enter the speed for the intial segment of the trip (mph): ", 0
+    miles_prompt_message            db  "For how many miles will you maintain this average speed? ", 0
+    final_speed_prompt_message      db  "What will be your speed during the final segment of the trip (mph)? ", 0
+    average_speed_message           db  "Your average speed will be %1.18lf", 0
+    total_time_message              db  "the total travel time will be %1.18lf", 0
 
     two_hundred_fifty_three_point_five  dq 253.5
     two_point_zero                      dq 2.0
@@ -50,7 +50,7 @@ startapplication:
     push qword  0
     mov qword   rax, 0
     mov         rdi, stringformat
-    mov         rsi, initialspeedpromptmessage
+    mov         rsi, initial_speed_prompt_message
     call        printf
     pop rax
 
@@ -67,7 +67,7 @@ startapplication:
     push qword  0
     mov qword   rax, 0
     mov         rdi, stringformat
-    mov         rsi, milespromptmessage
+    mov         rsi, miles_prompt_message
     call        printf
     pop rax
 
@@ -84,7 +84,7 @@ startapplication:
     push qword  0
     mov qword   rax, 0
     mov         rdi, stringformat
-    mov         rsi, finalspeedpromptmessage
+    mov         rsi, final_speed_prompt_message
     call        printf
     pop rax
 
