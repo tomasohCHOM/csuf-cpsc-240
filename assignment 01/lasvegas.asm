@@ -43,11 +43,7 @@ lasvegas:
     push    r15
     pushf
 
-    jmp     startapplication
-
-startapplication:
     ; Prompt for the speed of the intial segment of the trip
-    push qword  0
     mov qword   rax, 0
     mov         rdi, stringformat
     mov         rsi, initial_speed_prompt_message
@@ -97,7 +93,11 @@ startapplication:
     movsd       xmm2, [rsp]
     pop         rax
 
-setreturnvalue:
+    ; We have x initial speed and it is maintained for the first y miles
+    ; The number of hours passed is equal to y / x
+    movsd       xmm3, xmm0
+
+    ; Set return value now
     push        r14
     movsd       xmm0, [rsp]
     pop         r14

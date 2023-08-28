@@ -1,157 +1,161 @@
-     1                                  ; Begin code area
-     2                                  extern printf       ; external C++ function to write to standard output
-     3                                  extern scanf        ; external C++ function to read from standard input
-     4                                  global lasvegas
-     5                                  
-     6                                  segment .data
-     7                                      ; Declare some messages to the users
-     8 00000000 506C6561736520656E-         initialspeedpromptmessage   db  "Please enter the speed for the intial segment of the trip (mph): ", 0
-     8 00000009 746572207468652073-
-     8 00000012 7065656420666F7220-
-     8 0000001B 74686520696E746961-
-     8 00000024 6C207365676D656E74-
-     8 0000002D 206F66207468652074-
-     8 00000036 72697020286D706829-
-     8 0000003F 3A2000             
-     9 00000042 466F7220686F77206D-         milespromptmessage          db  "For how many miles will you maintain this average speed? ", 0
-     9 0000004B 616E79206D696C6573-
-     9 00000054 2077696C6C20796F75-
-     9 0000005D 206D61696E7461696E-
-     9 00000066 207468697320617665-
-     9 0000006F 726167652073706565-
-     9 00000078 643F2000           
-    10 0000007C 576861742077696C6C-         finalspeedpromptmessage     db  "What will be your speed during the final segment of the trip (mph)? ", 0
-    10 00000085 20626520796F757220-
-    10 0000008E 737065656420647572-
-    10 00000097 696E67207468652066-
-    10 000000A0 696E616C207365676D-
-    10 000000A9 656E74206F66207468-
-    10 000000B2 65207472697020286D-
-    10 000000BB 7068293F2000       
-    11 000000C1 596F75722061766572-         averagespeedmessage         db  "Your average speed will be %1.18lf", 0
-    11 000000CA 616765207370656564-
-    11 000000D3 2077696C6C20626520-
-    11 000000DC 25312E31386C6600   
-    12 000000E4 74686520746F74616C-         totaltimemessage            db  "the total travel time will be %1.18lf", 0
-    12 000000ED 2074726176656C2074-
-    12 000000F6 696D652077696C6C20-
-    12 000000FF 62652025312E31386C-
-    12 00000108 6600               
-    13                                  
-    14 0000010A 0000000000B06F40            two_hundred_fifty_three_point_five  dq 253.5
-    15 00000112 0000000000000040            two_point_zero                      dq 2.0
+     1                                  ; Name: Tomas Oh
+     2                                  ; Completion Date: -/-/-
+     3                                  
+     4                                  ; Begin code area
+     5                                  extern printf       ; external C++ function to write to standard output
+     6                                  extern scanf        ; external C++ function to read from standard input
+     7                                  global lasvegas
+     8                                  
+     9                                  segment .data
+    10                                      ; Declare some messages to the users
+    11 00000000 506C6561736520656E-         initial_speed_prompt_message    db  "Please enter the speed for the intial segment of the trip (mph): ", 0
+    11 00000009 746572207468652073-
+    11 00000012 7065656420666F7220-
+    11 0000001B 74686520696E746961-
+    11 00000024 6C207365676D656E74-
+    11 0000002D 206F66207468652074-
+    11 00000036 72697020286D706829-
+    11 0000003F 3A2000             
+    12 00000042 466F7220686F77206D-         miles_prompt_message            db  "For how many miles will you maintain this average speed? ", 0
+    12 0000004B 616E79206D696C6573-
+    12 00000054 2077696C6C20796F75-
+    12 0000005D 206D61696E7461696E-
+    12 00000066 207468697320617665-
+    12 0000006F 726167652073706565-
+    12 00000078 643F2000           
+    13 0000007C 576861742077696C6C-         final_speed_prompt_message      db  "What will be your speed during the final segment of the trip (mph)? ", 0
+    13 00000085 20626520796F757220-
+    13 0000008E 737065656420647572-
+    13 00000097 696E67207468652066-
+    13 000000A0 696E616C207365676D-
+    13 000000A9 656E74206F66207468-
+    13 000000B2 65207472697020286D-
+    13 000000BB 7068293F2000       
+    14 000000C1 596F75722061766572-         average_speed_message           db  "Your average speed will be %1.18lf", 0
+    14 000000CA 616765207370656564-
+    14 000000D3 2077696C6C20626520-
+    14 000000DC 25312E31386C6600   
+    15 000000E4 74686520746F74616C-         total_time_message              db  "the total travel time will be %1.18lf", 0
+    15 000000ED 2074726176656C2074-
+    15 000000F6 696D652077696C6C20-
+    15 000000FF 62652025312E31386C-
+    15 00000108 6600               
     16                                  
-    17 0000011A 257300                      stringformat        db "%s", 0
-    18 0000011D 256C6600                    eight_byte_format   db "%lf", 0
+    17 0000010A 0000000000B06F40            two_hundred_fifty_three_point_five  dq 253.5
+    18 00000112 0000000000000040            two_point_zero                      dq 2.0
     19                                  
-    20                                  
-    21                                  ; Begin executable instructions
-    22                                  segment .text
+    20 0000011A 257300                      stringformat        db "%s", 0
+    21 0000011D 256C6600                    eight_byte_format   db "%lf", 0
+    22                                  
     23                                  
-    24                                  lasvegas:
-    25                                      ; Back up all the GPRs
-    26 00000000 55                          push    rbp
-    27 00000001 4889E5                      mov     rbp, rsp
-    28 00000004 53                          push    rbx
-    29 00000005 51                          push    rcx
-    30 00000006 52                          push    rdx
-    31 00000007 56                          push    rsi
-    32 00000008 57                          push    rdi
-    33 00000009 4150                        push    r8
-    34 0000000B 4151                        push    r9
-    35 0000000D 4152                        push    r10
-    36 0000000F 4153                        push    r11
-    37 00000011 4154                        push    r12
-    38 00000013 4155                        push    r13
-    39 00000015 4156                        push    r14
-    40 00000017 4157                        push    r15
-    41 00000019 9C                          pushf
-    42                                  
-    43 0000001A EB00                        jmp     startapplication
-    44                                  
-    45                                  startapplication:
+    24                                  ; Begin executable instructions
+    25                                  segment .text
+    26                                  
+    27                                  lasvegas:
+    28                                      ; Back up all the GPRs
+    29 00000000 55                          push    rbp
+    30 00000001 4889E5                      mov     rbp, rsp
+    31 00000004 53                          push    rbx
+    32 00000005 51                          push    rcx
+    33 00000006 52                          push    rdx
+    34 00000007 56                          push    rsi
+    35 00000008 57                          push    rdi
+    36 00000009 4150                        push    r8
+    37 0000000B 4151                        push    r9
+    38 0000000D 4152                        push    r10
+    39 0000000F 4153                        push    r11
+    40 00000011 4154                        push    r12
+    41 00000013 4155                        push    r13
+    42 00000015 4156                        push    r14
+    43 00000017 4157                        push    r15
+    44 00000019 9C                          pushf
+    45                                  
     46                                      ; Prompt for the speed of the intial segment of the trip
-    47 0000001C 6A00                        push qword  0
-    48 0000001E B800000000                  mov qword   rax, 0
-    49 00000023 48BF-                       mov         rdi, stringformat
-    49 00000025 [1A01000000000000] 
-    50 0000002D 48BE-                       mov         rsi, initialspeedpromptmessage
-    50 0000002F [0000000000000000] 
-    51 00000037 E8(00000000)                call        printf
-    52 0000003C 58                          pop rax
-    53                                  
-    54                                      ; Obtain the initial speed from standard input
-    55 0000003D 6A00                        push qword  0
-    56 0000003F B800000000                  mov qword   rax, 0
-    57 00000044 48BF-                       mov         rdi, eight_byte_format
-    57 00000046 [1D01000000000000] 
-    58 0000004E 4889E6                      mov         rsi, rsp
-    59 00000051 E8(00000000)                call        scanf
-    60 00000056 F20F100424                  movsd       xmm0, [rsp]
-    61 0000005B 58                          pop         rax
-    62                                  
-    63                                      ; Prompt for the number of miles that the speed will be maintained
-    64 0000005C 6A00                        push qword  0
-    65 0000005E B800000000                  mov qword   rax, 0
-    66 00000063 48BF-                       mov         rdi, stringformat
-    66 00000065 [1A01000000000000] 
-    67 0000006D 48BE-                       mov         rsi, milespromptmessage
-    67 0000006F [4200000000000000] 
-    68 00000077 E8(00000000)                call        printf
-    69 0000007C 58                          pop rax
-    70                                  
-    71                                      ; Obtain the number of miles that this speed will be maintained
-    72 0000007D 6A00                        push qword  0
-    73 0000007F B800000000                  mov qword   rax, 0
-    74 00000084 48BF-                       mov         rdi, eight_byte_format
-    74 00000086 [1D01000000000000] 
-    75 0000008E 4889E6                      mov         rsi, rsp
-    76 00000091 E8(00000000)                call        scanf
-    77 00000096 F20F100C24                  movsd       xmm1, [rsp]
-    78 0000009B 58                          pop         rax
-    79                                  
-    80                                      ; Prompt for the speed of the final segment of the trip
-    81 0000009C 6A00                        push qword  0
-    82 0000009E B800000000                  mov qword   rax, 0
-    83 000000A3 48BF-                       mov         rdi, stringformat
-    83 000000A5 [1A01000000000000] 
-    84 000000AD 48BE-                       mov         rsi, finalspeedpromptmessage
-    84 000000AF [7C00000000000000] 
-    85 000000B7 E8(00000000)                call        printf
-    86 000000BC 58                          pop rax
-    87                                  
-    88                                      ; Obtain the final speed from standard input
-    89 000000BD 6A00                        push qword  0
-    90 000000BF B800000000                  mov qword   rax, 0
-    91 000000C4 48BF-                       mov         rdi, eight_byte_format
-    91 000000C6 [1D01000000000000] 
-    92 000000CE 4889E6                      mov         rsi, rsp
-    93 000000D1 E8(00000000)                call        scanf
-    94 000000D6 F20F101424                  movsd       xmm2, [rsp]
-    95 000000DB 58                          pop         rax
-    96                                  
-    97                                  setreturnvalue:
-    98 000000DC 4156                        push        r14
-    99 000000DE F20F100424                  movsd       xmm0, [rsp]
-   100 000000E3 415E                        pop         r14
-   101                                  
-   102                                      ; Restoring the original value to the GPRs
-   103 000000E5 9D                          popf
-   104 000000E6 415F                        pop        r15
-   105 000000E8 415E                        pop        r14
-   106 000000EA 415D                        pop        r13
-   107 000000EC 415C                        pop        r12
-   108 000000EE 415B                        pop        r11
-   109 000000F0 415A                        pop        r10
-   110 000000F2 4159                        pop        r9
-   111 000000F4 4158                        pop        r8
-   112 000000F6 5F                          pop        rdi
-   113 000000F7 5E                          pop        rsi
-   114 000000F8 5A                          pop        rdx
-   115 000000F9 59                          pop        rcx
-   116 000000FA 5B                          pop        rbx
-   117 000000FB 5D                          pop        rbp
-   118                                  
-   119 000000FC C3                          ret
-   120                                  
-   121                                  ; End of lasvegas.asm program
+    47 0000001A B800000000                  mov qword   rax, 0
+    48 0000001F 48BF-                       mov         rdi, stringformat
+    48 00000021 [1A01000000000000] 
+    49 00000029 48BE-                       mov         rsi, initial_speed_prompt_message
+    49 0000002B [0000000000000000] 
+    50 00000033 E8(00000000)                call        printf
+    51 00000038 58                          pop rax
+    52                                  
+    53                                      ; Obtain the initial speed from standard input
+    54 00000039 6A00                        push qword  0
+    55 0000003B B800000000                  mov qword   rax, 0
+    56 00000040 48BF-                       mov         rdi, eight_byte_format
+    56 00000042 [1D01000000000000] 
+    57 0000004A 4889E6                      mov         rsi, rsp
+    58 0000004D E8(00000000)                call        scanf
+    59 00000052 F20F100424                  movsd       xmm0, [rsp]
+    60 00000057 58                          pop         rax
+    61                                  
+    62                                      ; Prompt for the number of miles that the speed will be maintained
+    63 00000058 6A00                        push qword  0
+    64 0000005A B800000000                  mov qword   rax, 0
+    65 0000005F 48BF-                       mov         rdi, stringformat
+    65 00000061 [1A01000000000000] 
+    66 00000069 48BE-                       mov         rsi, miles_prompt_message
+    66 0000006B [4200000000000000] 
+    67 00000073 E8(00000000)                call        printf
+    68 00000078 58                          pop rax
+    69                                  
+    70                                      ; Obtain the number of miles that this speed will be maintained
+    71 00000079 6A00                        push qword  0
+    72 0000007B B800000000                  mov qword   rax, 0
+    73 00000080 48BF-                       mov         rdi, eight_byte_format
+    73 00000082 [1D01000000000000] 
+    74 0000008A 4889E6                      mov         rsi, rsp
+    75 0000008D E8(00000000)                call        scanf
+    76 00000092 F20F100C24                  movsd       xmm1, [rsp]
+    77 00000097 58                          pop         rax
+    78                                  
+    79                                      ; Prompt for the speed of the final segment of the trip
+    80 00000098 6A00                        push qword  0
+    81 0000009A B800000000                  mov qword   rax, 0
+    82 0000009F 48BF-                       mov         rdi, stringformat
+    82 000000A1 [1A01000000000000] 
+    83 000000A9 48BE-                       mov         rsi, final_speed_prompt_message
+    83 000000AB [7C00000000000000] 
+    84 000000B3 E8(00000000)                call        printf
+    85 000000B8 58                          pop rax
+    86                                  
+    87                                      ; Obtain the final speed from standard input
+    88 000000B9 6A00                        push qword  0
+    89 000000BB B800000000                  mov qword   rax, 0
+    90 000000C0 48BF-                       mov         rdi, eight_byte_format
+    90 000000C2 [1D01000000000000] 
+    91 000000CA 4889E6                      mov         rsi, rsp
+    92 000000CD E8(00000000)                call        scanf
+    93 000000D2 F20F101424                  movsd       xmm2, [rsp]
+    94 000000D7 58                          pop         rax
+    95                                  
+    96                                      ; We have x initial speed and it is maintained for the first y miles
+    97                                      ; The number of hours passed is equal to y / x
+    98 000000D8 F20F10D8                    movsd       xmm3, xmm0
+    99                                      
+   100                                  
+   101                                      ; Set return value now
+   102 000000DC 4156                        push        r14
+   103 000000DE F20F100424                  movsd       xmm0, [rsp]
+   104 000000E3 415E                        pop         r14
+   105                                  
+   106                                      ; Restoring the original value to the GPRs
+   107 000000E5 9D                          popf
+   108 000000E6 415F                        pop        r15
+   109 000000E8 415E                        pop        r14
+   110 000000EA 415D                        pop        r13
+   111 000000EC 415C                        pop        r12
+   112 000000EE 415B                        pop        r11
+   113 000000F0 415A                        pop        r10
+   114 000000F2 4159                        pop        r9
+   115 000000F4 4158                        pop        r8
+   116 000000F6 5F                          pop        rdi
+   117 000000F7 5E                          pop        rsi
+   118 000000F8 5A                          pop        rdx
+   119 000000F9 59                          pop        rcx
+   120 000000FA 5B                          pop        rbx
+   121 000000FB 5D                          pop        rbp
+   122                                  
+   123 000000FC C3                          ret
+   124                                  
+   125                                  ; End of lasvegas.asm program
