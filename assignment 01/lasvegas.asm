@@ -17,7 +17,7 @@ segment .data
     two_hundred_fifty_three_point_five  dq 253.5
     two_point_zero                      dq 2.0
 
-    stringformat        db "%s", 0
+    string_format       db "%s", 0
     eight_byte_format   db "%lf", 0
 
 
@@ -45,7 +45,7 @@ lasvegas:
 
     ; Prompt for the speed of the intial segment of the trip
     mov qword   rax, 0
-    mov         rdi, stringformat
+    mov         rdi, string_format
     mov         rsi, initial_speed_prompt_message
     call        printf
     pop rax
@@ -56,13 +56,13 @@ lasvegas:
     mov         rdi, eight_byte_format
     mov         rsi, rsp
     call        scanf
-    movsd       xmm0, [rsp]
+    movsd       xmm8, [rsp]
     pop         rax
 
     ; Prompt for the number of miles that the speed will be maintained
     push qword  0
     mov qword   rax, 0
-    mov         rdi, stringformat
+    mov         rdi, string_format
     mov         rsi, miles_prompt_message
     call        printf
     pop rax
@@ -73,13 +73,13 @@ lasvegas:
     mov         rdi, eight_byte_format
     mov         rsi, rsp
     call        scanf
-    movsd       xmm1, [rsp]
+    movsd       xmm9, [rsp]
     pop         rax
 
     ; Prompt for the speed of the final segment of the trip
     push qword  0
     mov qword   rax, 0
-    mov         rdi, stringformat
+    mov         rdi, string_format
     mov         rsi, final_speed_prompt_message
     call        printf
     pop rax
@@ -90,12 +90,22 @@ lasvegas:
     mov         rdi, eight_byte_format
     mov         rsi, rsp
     call        scanf
-    movsd       xmm2, [rsp]
+    movsd       xmm10, [rsp]
     pop         rax
 
     ; We have x initial speed and it is maintained for the first y miles
     ; The number of hours passed is equal to y / x
-    movsd       xmm3, xmm0
+    movsd       xmm11, xmm8
+    divsd       xmm11, xmm9
+    pop         rax
+
+    mov         rax, 1
+    mov         rdi, string_format
+    mov         rsi, average_speed_message
+    movsd       xmm0, xmm11
+    call        printf
+    
+    ; movsd       xmm4, qword two_hundred_fifty_three_point_five
 
     ; Set return value now
     push        r14

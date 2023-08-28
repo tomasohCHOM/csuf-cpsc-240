@@ -44,7 +44,7 @@
     17 0000010A 0000000000B06F40            two_hundred_fifty_three_point_five  dq 253.5
     18 00000112 0000000000000040            two_point_zero                      dq 2.0
     19                                  
-    20 0000011A 257300                      stringformat        db "%s", 0
+    20 0000011A 257300                      string_format       db "%s", 0
     21 0000011D 256C6600                    eight_byte_format   db "%lf", 0
     22                                  
     23                                  
@@ -72,7 +72,7 @@
     45                                  
     46                                      ; Prompt for the speed of the intial segment of the trip
     47 0000001A B800000000                  mov qword   rax, 0
-    48 0000001F 48BF-                       mov         rdi, stringformat
+    48 0000001F 48BF-                       mov         rdi, string_format
     48 00000021 [1A01000000000000] 
     49 00000029 48BE-                       mov         rsi, initial_speed_prompt_message
     49 0000002B [0000000000000000] 
@@ -86,76 +86,87 @@
     56 00000042 [1D01000000000000] 
     57 0000004A 4889E6                      mov         rsi, rsp
     58 0000004D E8(00000000)                call        scanf
-    59 00000052 F20F100424                  movsd       xmm0, [rsp]
-    60 00000057 58                          pop         rax
+    59 00000052 F2440F100424                movsd       xmm8, [rsp]
+    60 00000058 58                          pop         rax
     61                                  
     62                                      ; Prompt for the number of miles that the speed will be maintained
-    63 00000058 6A00                        push qword  0
-    64 0000005A B800000000                  mov qword   rax, 0
-    65 0000005F 48BF-                       mov         rdi, stringformat
-    65 00000061 [1A01000000000000] 
-    66 00000069 48BE-                       mov         rsi, miles_prompt_message
-    66 0000006B [4200000000000000] 
-    67 00000073 E8(00000000)                call        printf
-    68 00000078 58                          pop rax
+    63 00000059 6A00                        push qword  0
+    64 0000005B B800000000                  mov qword   rax, 0
+    65 00000060 48BF-                       mov         rdi, string_format
+    65 00000062 [1A01000000000000] 
+    66 0000006A 48BE-                       mov         rsi, miles_prompt_message
+    66 0000006C [4200000000000000] 
+    67 00000074 E8(00000000)                call        printf
+    68 00000079 58                          pop rax
     69                                  
     70                                      ; Obtain the number of miles that this speed will be maintained
-    71 00000079 6A00                        push qword  0
-    72 0000007B B800000000                  mov qword   rax, 0
-    73 00000080 48BF-                       mov         rdi, eight_byte_format
-    73 00000082 [1D01000000000000] 
-    74 0000008A 4889E6                      mov         rsi, rsp
-    75 0000008D E8(00000000)                call        scanf
-    76 00000092 F20F100C24                  movsd       xmm1, [rsp]
-    77 00000097 58                          pop         rax
+    71 0000007A 6A00                        push qword  0
+    72 0000007C B800000000                  mov qword   rax, 0
+    73 00000081 48BF-                       mov         rdi, eight_byte_format
+    73 00000083 [1D01000000000000] 
+    74 0000008B 4889E6                      mov         rsi, rsp
+    75 0000008E E8(00000000)                call        scanf
+    76 00000093 F2440F100C24                movsd       xmm9, [rsp]
+    77 00000099 58                          pop         rax
     78                                  
     79                                      ; Prompt for the speed of the final segment of the trip
-    80 00000098 6A00                        push qword  0
-    81 0000009A B800000000                  mov qword   rax, 0
-    82 0000009F 48BF-                       mov         rdi, stringformat
-    82 000000A1 [1A01000000000000] 
-    83 000000A9 48BE-                       mov         rsi, final_speed_prompt_message
-    83 000000AB [7C00000000000000] 
-    84 000000B3 E8(00000000)                call        printf
-    85 000000B8 58                          pop rax
+    80 0000009A 6A00                        push qword  0
+    81 0000009C B800000000                  mov qword   rax, 0
+    82 000000A1 48BF-                       mov         rdi, string_format
+    82 000000A3 [1A01000000000000] 
+    83 000000AB 48BE-                       mov         rsi, final_speed_prompt_message
+    83 000000AD [7C00000000000000] 
+    84 000000B5 E8(00000000)                call        printf
+    85 000000BA 58                          pop rax
     86                                  
     87                                      ; Obtain the final speed from standard input
-    88 000000B9 6A00                        push qword  0
-    89 000000BB B800000000                  mov qword   rax, 0
-    90 000000C0 48BF-                       mov         rdi, eight_byte_format
-    90 000000C2 [1D01000000000000] 
-    91 000000CA 4889E6                      mov         rsi, rsp
-    92 000000CD E8(00000000)                call        scanf
-    93 000000D2 F20F101424                  movsd       xmm2, [rsp]
-    94 000000D7 58                          pop         rax
+    88 000000BB 6A00                        push qword  0
+    89 000000BD B800000000                  mov qword   rax, 0
+    90 000000C2 48BF-                       mov         rdi, eight_byte_format
+    90 000000C4 [1D01000000000000] 
+    91 000000CC 4889E6                      mov         rsi, rsp
+    92 000000CF E8(00000000)                call        scanf
+    93 000000D4 F2440F101424                movsd       xmm10, [rsp]
+    94 000000DA 58                          pop         rax
     95                                  
     96                                      ; We have x initial speed and it is maintained for the first y miles
     97                                      ; The number of hours passed is equal to y / x
-    98 000000D8 F20F10D8                    movsd       xmm3, xmm0
-    99                                      
-   100                                  
-   101                                      ; Set return value now
-   102 000000DC 4156                        push        r14
-   103 000000DE F20F100424                  movsd       xmm0, [rsp]
-   104 000000E3 415E                        pop         r14
-   105                                  
-   106                                      ; Restoring the original value to the GPRs
-   107 000000E5 9D                          popf
-   108 000000E6 415F                        pop        r15
-   109 000000E8 415E                        pop        r14
-   110 000000EA 415D                        pop        r13
-   111 000000EC 415C                        pop        r12
-   112 000000EE 415B                        pop        r11
-   113 000000F0 415A                        pop        r10
-   114 000000F2 4159                        pop        r9
-   115 000000F4 4158                        pop        r8
-   116 000000F6 5F                          pop        rdi
-   117 000000F7 5E                          pop        rsi
-   118 000000F8 5A                          pop        rdx
-   119 000000F9 59                          pop        rcx
-   120 000000FA 5B                          pop        rbx
-   121 000000FB 5D                          pop        rbp
-   122                                  
-   123 000000FC C3                          ret
-   124                                  
-   125                                  ; End of lasvegas.asm program
+    98 000000DB F2450F10D8                  movsd       xmm11, xmm8
+    99 000000E0 F2450F5ED9                  divsd       xmm11, xmm9
+   100 000000E5 58                          pop         rax
+   101                                  
+   102 000000E6 B801000000                  mov         rax, 1
+   103 000000EB 48BF-                       mov         rdi, string_format
+   103 000000ED [1A01000000000000] 
+   104 000000F5 48BE-                       mov         rsi, average_speed_message
+   104 000000F7 [C100000000000000] 
+   105 000000FF F2410F10C3                  movsd       xmm0, xmm11
+   106 00000104 E8(00000000)                call        printf
+   107                                      
+   108                                      ; movsd       xmm4, qword two_hundred_fifty_three_point_five
+   109                                  
+   110                                      ; Set return value now
+   111 00000109 4156                        push        r14
+   112 0000010B F20F100424                  movsd       xmm0, [rsp]
+   113 00000110 415E                        pop         r14
+   114                                  
+   115                                      ; Restoring the original value to the GPRs
+   116 00000112 9D                          popf
+   117 00000113 415F                        pop        r15
+   118 00000115 415E                        pop        r14
+   119 00000117 415D                        pop        r13
+   120 00000119 415C                        pop        r12
+   121 0000011B 415B                        pop        r11
+   122 0000011D 415A                        pop        r10
+   123 0000011F 4159                        pop        r9
+   124 00000121 4158                        pop        r8
+   125 00000123 5F                          pop        rdi
+   126 00000124 5E                          pop        rsi
+   127 00000125 5A                          pop        rdx
+   128 00000126 59                          pop        rcx
+   129 00000127 5B                          pop        rbx
+   130 00000128 5D                          pop        rbp
+   131                                  
+   132 00000129 C3                          ret
+   133                                  
+   134                                  ; End of lasvegas.asm program
