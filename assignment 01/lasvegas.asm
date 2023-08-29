@@ -96,8 +96,19 @@ lasvegas:
     ; We have x initial speed and it is maintained for the first y miles
     ; The number of hours passed is equal to y / x
     movsd       xmm11, xmm8
-    divsd       xmm11, xmm9
-    pop         rax
+    divsd       xmm11, xmm9 ; xmm11 = y / x in hours
+
+    movsd       xmm12, qword [two_hundred_fifty_three_point_five]
+    subsd       xmm12, xmm9 ; xmm12 = distance - miles (2nd input)
+
+    movsd       xmm13, xmm12
+    divsd       xmm13, xmm10 ; xmm13 = remaining distance / final speed in hours
+
+    movsd       xmm14, xmm11 ; initial time
+    addsd       xmm14, xmm13 ; total time
+
+    movsd       xmm15, xmm12
+    divsd       xmm15, xmm4  ; average speed in the entire trip
 
     mov         rax, 1
     mov         rdi, string_format

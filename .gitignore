@@ -2,6 +2,7 @@
 *.pdf
 *.o
 *.out
+*.lis
 *.zip
 .~*
 /_*
