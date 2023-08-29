@@ -11,8 +11,8 @@ segment .data
     initial_speed_prompt_message    db  "Please enter the speed for the intial segment of the trip (mph): ", 0
     miles_prompt_message            db  "For how many miles will you maintain this average speed? ", 0
     final_speed_prompt_message      db  "What will be your speed during the final segment of the trip (mph)? ", 0
-    average_speed_message           db  "Your average speed will be %1.18lf", 0
-    total_time_message              db  "the total travel time will be %1.18lf", 0
+    average_speed_message           db  "Your average speed will be %1.18lf mph.", 10, 0
+    total_time_message              db  "The total travel time will be %1.18lf hours.", 10, 0
 
     two_hundred_fifty_three_point_five  dq 253.5
     two_point_zero                      dq 2.0
@@ -95,29 +95,33 @@ lasvegas:
 
     ; We have x initial speed and it is maintained for the first y miles
     ; The number of hours passed is equal to y / x
-    movsd       xmm11, xmm8
-    divsd       xmm11, xmm9 ; xmm11 = y / x in hours
+    movsd       xmm11, xmm9
+    divsd       xmm11, xmm8     ; xmm11 = y / x in hours
 
     movsd       xmm12, qword [two_hundred_fifty_three_point_five]
-    subsd       xmm12, xmm9 ; xmm12 = distance - miles (2nd input)
+    subsd       xmm12, xmm9     ; xmm12 = distance - miles (2nd input)
 
     movsd       xmm13, xmm12
-    divsd       xmm13, xmm10 ; xmm13 = remaining distance / final speed in hours
+    divsd       xmm13, xmm10    ; xmm13 = remaining distance / final speed in hours
 
-    movsd       xmm14, xmm11 ; initial time
-    addsd       xmm14, xmm13 ; total time
+    movsd       xmm14, xmm11    ; initial time
+    addsd       xmm14, xmm13    ; total time = xmm14 + xmm13
 
-    movsd       xmm15, xmm12
-    divsd       xmm15, xmm4  ; average speed in the entire trip
+    movsd       xmm15, qword [two_hundred_fifty_three_point_five]
+    divsd       xmm15, xmm14    ; average speed in the entire trip
+    movsd       [rsp], xmm15
+
+    push qword  0
+    mov         rax, 1
+    mov         rdi, average_speed_message
+    movsd       xmm0, xmm15
+    call        printf
 
     mov         rax, 1
-    mov         rdi, string_format
-    mov         rsi, average_speed_message
-    movsd       xmm0, xmm11
+    mov         rdi, total_time_message
+    movsd       xmm0, xmm14
     call        printf
     
-    ; movsd       xmm4, qword two_hundred_fifty_three_point_five
-
     ; Set return value now
     push        r14
     movsd       xmm0, [rsp]
