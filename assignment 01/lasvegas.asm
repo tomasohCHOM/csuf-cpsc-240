@@ -1,5 +1,9 @@
 ; Name: Tomas Oh
-; Completion Date: -/-/-
+; Completion Date: 08/30/2023
+; Known problems:
+;   If inputting a negaive number between 0 (non-inclusive) and -1 (non-inclusive),
+;   the program will crash with a Trace/breakpoint Trap. However, if above or equal
+;   to -1, it will run accordingly and return 0 to the C++ module.
 
 ; Begin code area
 extern printf       ; external C++ function to write to standard output
@@ -59,8 +63,8 @@ lasvegas:
     mov         rsi, rsp
     call        scanf
     movsd       xmm8, [rsp]
-    ucomisd     xmm8, xmm12     ; compare the value to zero (xmm12 = 0)
-    jb          negative        ; jump to the negative section if input < 0
+    ucomisd     xmm8, xmm12     ; compare to xmm12 which is equal to 0
+    jbe         negative        ; jump to the negative section if input < 0
     pop         rax
 
     ; Prompt for the number of miles that the speed will be maintained
@@ -79,10 +83,10 @@ lasvegas:
     call        scanf
     movsd       xmm9, [rsp]
     ucomisd     xmm9, xmm12     ; compare the value to zero (xmm13 = 0)
-    jb          negative        ; jump to the negative section if input < 0
+    jbe         negative        ; jump to the negative section if input < 0
     movsd       xmm15, qword [two_hundred_fifty_three_point_five]
     ucomisd     xmm9, xmm15
-    ja          greater_than_or_equal_to_miles
+    jae         greater_than_or_equal_to_miles
     pop         rax
 
     ; Prompt for the speed of the final segment of the trip
@@ -101,7 +105,7 @@ lasvegas:
     call        scanf
     movsd       xmm10, [rsp]
     ucomisd     xmm10, xmm12     ; compare the value to zero (xmm12 = 0)
-    jb          negative        ; jump to the negative section if input < 0
+    jbe         negative        ; jump to the negative section if input < 0
     pop         rax
 
     ; We have x initial speed and it is maintained for the first y miles
