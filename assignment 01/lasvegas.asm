@@ -13,6 +13,8 @@ segment .data
     final_speed_prompt_message      db  "What will be your speed during the final segment of the trip (mph)? ", 0
     average_speed_message           db  "Your average speed will be %1.18lf mph.", 10, 0
     total_time_message              db  "The total travel time will be %1.18lf hours.", 10, 0
+    
+    invalid_message     db  "The input is invalid and was rejected by the program. The program will soon terminate. Please run it again.", 10, 0
 
     two_hundred_fifty_three_point_five  dq 253.5
     two_point_zero                      dq 2.0
@@ -57,6 +59,8 @@ lasvegas:
     mov         rsi, rsp
     call        scanf
     movsd       xmm8, [rsp]
+    ucomisd     xmm8, xmm12     ; compare the value to zero (xmm12 = 0)
+    jb          negative        ; jump to the negative section if input < 0
     pop         rax
 
     ; Prompt for the number of miles that the speed will be maintained
@@ -74,6 +78,11 @@ lasvegas:
     mov         rsi, rsp
     call        scanf
     movsd       xmm9, [rsp]
+    ucomisd     xmm9, xmm12     ; compare the value to zero (xmm13 = 0)
+    jb          negative        ; jump to the negative section if input < 0
+    movsd       xmm15, qword [two_hundred_fifty_three_point_five]
+    ucomisd     xmm9, xmm15
+    ja          greater_than_or_equal_to_miles
     pop         rax
 
     ; Prompt for the speed of the final segment of the trip
@@ -91,6 +100,8 @@ lasvegas:
     mov         rsi, rsp
     call        scanf
     movsd       xmm10, [rsp]
+    ucomisd     xmm10, xmm12     ; compare the value to zero (xmm12 = 0)
+    jb          negative        ; jump to the negative section if input < 0
     pop         rax
 
     ; We have x initial speed and it is maintained for the first y miles
@@ -121,12 +132,23 @@ lasvegas:
     mov         rdi, total_time_message
     movsd       xmm0, xmm14
     call        printf
-    
-    ; Set return value now
-    push        r14
-    movsd       xmm0, [rsp]
-    pop         r14
 
+    jmp         setreturnvalue
+
+negative:
+    mov         rax, 0
+    mov         rdi, invalid_message
+    call        printf
+    jmp         setreturnvalue
+
+greater_than_or_equal_to_miles:
+    mov         rax, 0
+    mov         rdi, invalid_message
+    call        printf
+    jmp         setreturnvalue
+
+setreturnvalue:
+    movsd       xmm0, xmm14     ; Save the total time in xmm0 to return
     ; Restoring the original value to the GPRs
     popf
     pop        r15
