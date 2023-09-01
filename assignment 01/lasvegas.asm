@@ -4,6 +4,9 @@
 ;   If inputting a negaive number between 0 (non-inclusive) and -1 (non-inclusive),
 ;   the program will crash with a Trace/breakpoint Trap. However, if above or equal
 ;   to -1, it will run accordingly and return 0 to the C++ module.
+;   UPDATE (09/01/2023): This issue will also occur if the number of miles inputted is
+;   between 253.5 and 254.5 (both non-inclusive) except for 254. That nuance of being 
+;   between 0-1 (and it being a floating point number) seems to cause the bug.
 
 ; Begin code area
 extern printf       ; external C++ function to write to standard output
@@ -18,6 +21,8 @@ segment .data
     average_speed_message           db  "Your average speed will be %1.18lf mph.", 10, 0
     total_time_message              db  "The total travel time will be %1.18lf hours.", 10, 0
     
+    negative_message    db  "You inputted a negative or 0 as a number.", 10, 0
+    greater_num_message db  "You inputted a number greater than or equal to the number of miles.", 10, 0
     invalid_message     db  "The input is invalid and was rejected by the program. The program will soon terminate. Please run it again.", 10, 0
 
     two_hundred_fifty_three_point_five  dq 253.5
@@ -141,11 +146,19 @@ lasvegas:
 
 negative:
     mov         rax, 0
+    mov         rdi, negative_message
+    call        printf
+
+    mov         rax, 0
     mov         rdi, invalid_message
     call        printf
     jmp         setreturnvalue
 
 greater_than_or_equal_to_miles:
+    mov         rax, 0
+    mov         rdi, greater_num_message
+    call        printf
+
     mov         rax, 0
     mov         rdi, invalid_message
     call        printf
