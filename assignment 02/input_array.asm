@@ -1,3 +1,4 @@
+extern scanf
 global input_array
 
 segment .data:
