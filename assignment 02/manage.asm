@@ -1,3 +1,5 @@
+number_of_cells equ 8
+
 extern printf         ; external C function to write to standard output
 extern input_array    ; external function from the assembly module input_array.asm
 extern show_numbers   ; external function from the assembly module output_array.asm
@@ -38,10 +40,15 @@ manage_array:
     push      r15
     pushf
 
-    ; Show the initial messasge to the user
+    ; Show the initial messasges to the user
     mov qword rax, 0
     mov       rdi, string_format
     mov       rsi, initial_message
+    call      printf
+
+    mov       rax, 0
+    mov       rdi, string_format
+    mov       rsi, input_numbers_message
     call      printf
 
     ; Prepare to take in numbers to the array by using the external
@@ -57,7 +64,7 @@ manage_array:
     mov       rax, 0
     mov       rdi, plywood
     mov       rsi, r13
-    call      output_array
+    call      show_numbers
 
     xorpd     xmm0, xmm0
     ; Restoring the original value to the General Purpose Registers

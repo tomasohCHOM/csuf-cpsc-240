@@ -1,8 +1,11 @@
 extern scanf
+extern printf
 global input_array
 
 segment .data:
     floatform db "%lf", 0
+    debug     db "ur mom", 10, 0
+    string_format db "%s", 0
 
 segment .text:
 
@@ -25,6 +28,12 @@ input_array:
     push    r15
     pushf
 
+    mov rax, 0
+    mov rdi, string_format
+    mov rsi, debug
+    call printf
+    ; pop rax
+
     mov     r14, rdi    ; r14 is the array
     mov     r15, rsi    ; r15 is the upper-limit of the number of cells in the array
     mov     r13, 0      ; r13 to count input
@@ -38,9 +47,9 @@ input_number:
     cmp         r13, r15
     jge         input_finished
 
+    push qword  0
     mov         rax, 0
     mov         rdi, floatform
-    push qword  0
     mov         rdi, rsp
     call        scanf       ; either a float number or ctrl-d
     cdqe
@@ -61,7 +70,7 @@ input_finished:
 
     ; Restoring the original value to the GPRs
     popf
-    pop   r15
+    pop    r15
     pop    r14
     pop    r13
     pop    r12
