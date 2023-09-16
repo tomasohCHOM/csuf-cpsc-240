@@ -6,7 +6,7 @@ extern printf
 global show_numbers
 
 segment .data
-    number_in_array db "1.10lf%", 10, 0
+    number_in_array db "%1.10lf", 10, 0
 
 segment .text
 

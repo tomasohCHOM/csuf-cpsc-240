@@ -53,27 +53,27 @@ input_number:
     push qword  0
     mov         rsi, rsp
     call        scanf       ; either a float number or ctrl-d
+    mov         r8, rax
 
     cdqe
     cmp         rax, -1
     je          input_finished
 
     ; mov rax, 0
-    mov rdi, debug
-    ; push rax
-    call printf
+    mov rdi,    debug
+    call        printf
     pop         rax
     ; r14 is the address of the array. r13 is like the "index"
     ; of the array. By multiplying r13 * 8, we move 8 bytes to the
     ; next iteration to input more numbers.
-    mov     [r14 + r13*8], rax
+    mov     [r14 + r13*8], r8
     inc     r13
     jmp     input_number
 
 input_finished:
     ; r13 holds the count of numbers in the array.
     ; Move it to rax as we are required to return that number.
-    mov     rbx, r13
+    mov     rax, r13
 
     ; Restoring the original value to the GPRs
     popf
