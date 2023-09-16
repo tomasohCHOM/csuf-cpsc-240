@@ -1,4 +1,4 @@
-number_of_cells equ 8
+array_size equ 8
 
 extern printf         ; external C function to write to standard output
 extern input_array    ; external function from the assembly module input_array.asm
@@ -17,7 +17,7 @@ segment .data
 
 segment .bss
     align   16
-    plywood resq number_of_cells
+    array resq array_size
 
 section .text
 
@@ -54,15 +54,20 @@ manage_array:
     ; Prepare to take in numbers to the array by using the external
     ; assembly function from module input_array.asm
     mov       rax, 0
-    mov       rdi, plywood
-    mov       rsi, number_of_cells
+    mov       rdi, array
+    mov       rsi, array_size
     call      input_array
     mov       r13, rax
+
+    mov       rax, 0
+    mov       rdi, string_format
+    mov       rsi, show_numbers_message
+    call      printf
 
     ; Output the elements in the array using the external assembly
     ; function from module output_array.asm
     mov       rax, 0
-    mov       rdi, plywood
+    mov       rdi, array
     mov       rsi, r13
     call      show_numbers
 

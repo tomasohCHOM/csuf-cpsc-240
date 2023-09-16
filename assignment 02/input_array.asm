@@ -2,12 +2,12 @@ extern scanf
 extern printf
 global input_array
 
-segment .data:
+segment .data
     floatform db "%lf", 0
     debug     db "ur mom", 10, 0
     string_format db "%s", 0
 
-segment .text:
+segment .text
 
 input_array:
     ; Back up all the GPRs
@@ -28,15 +28,15 @@ input_array:
     push    r15
     pushf
 
-    mov rax, 0
-    mov rdi, string_format
-    mov rsi, debug
-    call printf
-    ; pop rax
+    ; mov rax, 0
+    ; mov rdi, string_format
+    ; mov rsi, debug
+    ; call printf
+    pop rax
 
     mov     r14, rdi    ; r14 is the array
     mov     r15, rsi    ; r15 is the upper-limit of the number of cells in the array
-    mov     r13, 0      ; r13 to count input
+    xor     r13, r13    ; r13 to count input
     jmp     input_number
 
 ; A loop that will keep asking for more floating-point numbers until
@@ -47,11 +47,13 @@ input_number:
     cmp         r13, r15
     jge         input_finished
 
-    push qword  0
+    ; Read a floating point number from user
     mov         rax, 0
     mov         rdi, floatform
-    mov         rdi, rsp
+    push qword  0
+    mov         rsi, rsp
     call        scanf       ; either a float number or ctrl-d
+
     cdqe
     cmp         rax, -1
     je          input_finished
@@ -59,14 +61,14 @@ input_number:
     ; r14 is the address of the array. r13 is like the "index"
     ; of the array. By multiplying r13 * 8, we move 8 bytes to the
     ; next iteration to input more numbers.
-    mov     [r14 + r13*8], rax
+    mov     [r14 + r13*8], rbx
     inc     r13
     jmp     input_number
 
 input_finished:
     ; r13 holds the count of numbers in the array.
     ; Move it to rax as we are required to return that number.
-    mov     rax, r13
+    mov     rbx, r13
 
     ; Restoring the original value to the GPRs
     popf

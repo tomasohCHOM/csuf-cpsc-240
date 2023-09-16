@@ -37,52 +37,53 @@ show_numbers:
     ;Registers rax, rip, and rsp are usually not backed up.
 
     ;Back up the incoming parameter
-    mov r13, rdi  ;r13 is the array
-    mov r14, rsi  ;r14 is the count of valid numbers in the array
+    mov     r13, rdi  ;r13 is the array
+    mov     r14, rsi  ;r14 is the count of valid numbers in the array
 
     ;Block that displays the header
-    mov rax, 0
-    mov rdi, header
-    call printf
+    mov     rax, 0
+    mov     rdi, header
+    call    printf
 
     ;Block to create a loop
-    xor r15,r15   ;r15 is the loop counter
+    xor     r15, r15   ;r15 is the loop counter
 
 begin_loop:
-    cmp r15,r14
-    jge done
-    mov rax,1
-    mov rdi,dataline       ;First parameter
-    mov rsi,r15            ;Second paramter
-    mov r12,r15
-    shl r12,3              ;<==Fast multiplication by 8
-    add r12,r13
-    mov rdx,r12            ;Third parameter
-    movsd xmm0,[r13+8*r15] ;Fourth parameter
-    mov rcx,[r13+8*r15]    ;Fifth parameter
-    call printf
-    inc r15
-    jmp begin_loop
+    cmp     r15, r14
+    jge     done
+
+    mov     rax, 1
+    mov     rdi, dataline       ;First parameter
+    mov     rsi, r15            ;Second paramter
+    mov     r12, r15
+    shl     r12, 3              ;<==Fast multiplication by 8
+    add     r12, r13
+    mov     rdx, r12            ;Third parameter
+    movsd   xmm0, [r13+8*r15] ;Fourth parameter
+    mov     rcx, [r13+8*r15]    ;Fifth parameter
+    call    printf
+    inc     r15
+    jmp     begin_loop
 
 done:
     ;return 0 which is the traditional signal of success
-    xor rax,rax
+    xor     rax, rax
 
     ; Restoring the original value to the GPRs
     popf
-    pop       r15
-    pop       r14
-    pop       r13
-    pop       r12
-    pop       r11
-    pop       r10
-    pop       r9
-    pop       r8
-    pop       rdi
-    pop       rsi
-    pop       rdx
-    pop       rcx
-    pop       rbx
-    pop       rbp
+    pop     r15
+    pop     r14
+    pop     r13
+    pop     r12
+    pop     r11
+    pop     r10
+    pop     r9
+    pop     r8
+    pop     rdi
+    pop     rsi
+    pop     rdx
+    pop     rcx
+    pop     rbx
+    pop     rbp
 
     ret
