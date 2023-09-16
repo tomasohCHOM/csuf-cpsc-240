@@ -4,7 +4,7 @@ global input_array
 
 segment .data
     floatform db "%lf", 0
-    debug     db "ur mom", 10, 0
+    debug     db "The inputted number is: %1.18lf", 10, 0
     string_format db "%s", 0
 
 segment .text
@@ -57,6 +57,11 @@ input_number:
     cdqe
     cmp         rax, -1
     je          input_finished
+
+    ; mov rax, 0
+    mov rdi, debug
+    ; push rax
+    call printf
     pop         rax
     ; r14 is the address of the array. r13 is like the "index"
     ; of the array. By multiplying r13 * 8, we move 8 bytes to the
