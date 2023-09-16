@@ -61,7 +61,7 @@ input_number:
     ; r14 is the address of the array. r13 is like the "index"
     ; of the array. By multiplying r13 * 8, we move 8 bytes to the
     ; next iteration to input more numbers.
-    mov     [r14 + r13*8], rbx
+    mov     [r14 + r13*8], rax
     inc     r13
     jmp     input_number
 

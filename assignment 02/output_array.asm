@@ -2,16 +2,11 @@
 ; Author email: tomasoh@fullerton.edu
 
 ;Declarations
-null equ 0
-newline equ 10
-
 extern printf
 global show_numbers
 
 segment .data
-
-    header db "Cell#   Address (aligned)      Data decimal     Data hex (IEEE)",newline,null
-    dataline db "%3ld   0x%016lx   %16.8lf   0x%016lx",newline,null
+    number_in_array db "1.10lf%", 10, 0
 
 segment .text
 
@@ -40,11 +35,6 @@ show_numbers:
     mov     r13, rdi  ;r13 is the array
     mov     r14, rsi  ;r14 is the count of valid numbers in the array
 
-    ;Block that displays the header
-    mov     rax, 0
-    mov     rdi, header
-    call    printf
-
     ;Block to create a loop
     xor     r15, r15   ;r15 is the loop counter
 
@@ -53,7 +43,7 @@ begin_loop:
     jge     done
 
     mov     rax, 1
-    mov     rdi, dataline       ;First parameter
+    mov     rdi, number_in_array
     mov     rsi, r15            ;Second paramter
     mov     r12, r15
     shl     r12, 3              ;<==Fast multiplication by 8
