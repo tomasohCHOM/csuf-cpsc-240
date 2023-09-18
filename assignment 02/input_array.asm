@@ -1,5 +1,6 @@
 extern scanf
 extern printf
+
 global input_array
 
 segment .data
@@ -32,7 +33,8 @@ input_array:
     ; mov rdi, string_format
     ; mov rsi, debug
     ; call printf
-    pop rax
+
+    push qword 0
 
     mov     r14, rdi    ; r14 is the array
     mov     r15, rsi    ; r15 is the upper-limit of the number of cells in the array
@@ -53,26 +55,26 @@ input_number:
     push qword  0
     mov         rsi, rsp
     call        scanf       ; either a float number or ctrl-d
-    mov         r8, rax
 
     cdqe
     cmp         rax, -1
+    pop         r8
     je          input_finished
 
-    ; mov rax, 0
-    mov rdi,    debug
-    call        printf
-    pop         rax
+    pop rax
+
     ; r14 is the address of the array. r13 is like the "index"
     ; of the array. By multiplying r13 * 8, we move 8 bytes to the
     ; next iteration to input more numbers.
     mov     [r14 + r13*8], r8
     inc     r13
+    push rax
     jmp     input_number
 
 input_finished:
     ; r13 holds the count of numbers in the array.
     ; Move it to rax as we are required to return that number.
+    pop rax
     mov     rax, r13
 
     ; Restoring the original value to the GPRs

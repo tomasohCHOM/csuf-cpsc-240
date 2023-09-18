@@ -2,15 +2,13 @@
 ; Author email: tomasoh@fullerton.edu
 
 ;Declarations
-extern printf
-global output_array
+global sum_array
 
 segment .data
-    number_in_array db "%1.10lf", 10, 0
 
 segment .text
 
-output_array:
+sum_array:
     ; Back up all the GPRs
     push    rbp
     mov     rbp, rsp
@@ -42,22 +40,13 @@ begin_loop:
     cmp     r13, r15
     jge     done
 
-    mov     rax, 1
-    mov     rdi, number_in_array
-    mov     rsi, r13            ;Second paramter
-    mov     r12, r13
-    shl     r12, 3              ;<==Fast multiplication by 8
-    add     r12, r14
-    mov     rdx, r12            ;Third parameter
-    movsd   xmm0, [r14+8*r13]   ;Fourth parameter
-    mov     rcx, [r14+8*r13]    ;Fifth parameter
-    call    printf
+    addsd   xmm8, [r14+8*r13]
     inc     r13
     jmp     begin_loop
 
 done:
-    ;return 0 which is the traditional signal of success
-    xor     rax, rax
+    ; Move the calculated sum to xmm0
+    movsd   xmm0, xmm8
 
     ; Restoring the original value to the GPRs
     popf

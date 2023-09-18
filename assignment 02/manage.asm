@@ -1,8 +1,9 @@
 array_size equ 8
 
-extern printf         ; external C function to write to standard output
-extern input_array    ; external function from the assembly module input_array.asm
-extern show_numbers   ; external function from the assembly module output_array.asm
+extern printf       ; external C function to write to standard output
+extern input_array  ; external function from the assembly module input_array.asm
+extern output_array ; external function from the assembly module output_array.asm
+extern sum_array    ; external function from the assembly module sum.asm   
 global manage_array
 
 segment .data
@@ -69,9 +70,21 @@ manage_array:
     mov         rax, 0
     mov         rdi, array
     mov         rsi, r13
-    call        show_numbers
+    call        output_array
 
-    xorpd       xmm0, xmm0
+    mov         rax, 0
+    mov         rdi, array
+    mov         rsi, r13
+    call        sum_array
+
+    movsd       xmm15, xmm0
+
+    mov         rax, 1
+    mov         rdi, sum_numbers_message
+    call        printf
+
+    movsd       xmm0, xmm15
+
     ; Restoring the original value to the General Purpose Registers
     popf
     pop     r15
