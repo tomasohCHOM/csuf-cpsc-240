@@ -37,10 +37,13 @@ sum_array:
     xor     r13, r13   ;r13 is the loop counter
 
 begin_loop:
+    ; Check if we are done with the loop or not
     cmp     r13, r15
     jge     done
 
+    ; Add the current value to the total
     addsd   xmm8, [r14+8*r13]
+    ;Increment the couter and jump to the next iteration
     inc     r13
     jmp     begin_loop
 

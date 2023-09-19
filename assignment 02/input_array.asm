@@ -1,3 +1,6 @@
+; Author name: Tomas Oh
+; Author email: tomasoh@fullerton.edu
+
 extern scanf
 extern printf
 
@@ -56,6 +59,7 @@ input_number:
     mov         rsi, rsp
     call        scanf       ; either a float number or ctrl-d
 
+    ; Checks if the user has inputted ctrl-d and finishes the job
     cdqe
     cmp         rax, -1
     pop         r8

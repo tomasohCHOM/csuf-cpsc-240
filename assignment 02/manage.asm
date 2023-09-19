@@ -1,3 +1,15 @@
+; Author name: Tomas Oh
+; Author email: tomasoh@csu.fullerton.edu
+; For: Assignment 2 - Array Management System
+; Purpose of this file:
+;   This is the manage.asm module used to create an array of doubles using user input.
+;   The function itself calls three other functions, namely input_array, output_array,
+;   and sum_array. It also takes in a pointer to an unsigned long integer (from C driver), 
+;   which is the number of user inputs present in the array (although the mac capacity is 8).
+;   This assembly module will return an array of doubles, and will modify the parameter
+;   coming from rdi to be the number of inputs from the user.
+; Completion Date: 09/18/2023
+
 array_size equ 8
 
 extern printf       ; external C function to write to standard output
@@ -41,6 +53,8 @@ manage_array:
     push    r15
     pushf
 
+
+
     ; Show the initial messasges to the user
     mov qword   rax, 0
     mov         rdi, string_format
@@ -60,6 +74,7 @@ manage_array:
     call        input_array
     mov         r13, rax
 
+    ; Print a message that it will show the numbers in the array next
     mov         rax, 0
     mov         rdi, string_format
     mov         rsi, show_numbers_message
@@ -72,18 +87,23 @@ manage_array:
     mov         rsi, r13
     call        output_array
 
+    ; Print a message that it will sum each of the numbers in the array
     mov         rax, 0
     mov         rdi, array
     mov         rsi, r13
     call        sum_array
-
+    ; Move the result to a safe register (xmm15)
     movsd       xmm15, xmm0
 
+    ; Print the result to the user
     mov         rax, 1
     mov         rdi, sum_numbers_message
     call        printf
 
+    ; Return a double which is the sum of the elements in the array
+    ; OR for the challenge part, prepare to return the array itself 
     movsd       xmm0, xmm15
+    mov         rax, r13    ; We need to move the value of r13 to rax because r13 will be restored
 
     ; Restoring the original value to the General Purpose Registers
     popf
@@ -101,5 +121,9 @@ manage_array:
     pop     rcx
     pop     rbx
     pop     rbp
+
+    ; Mutates the value of the parameter to the number of user inputs
+    mov qword [rdi], rax
+    mov rax, array    ; Return the array to the C module
 
     ret
