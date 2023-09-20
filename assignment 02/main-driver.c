@@ -23,9 +23,9 @@ int main() {
     // return_code = manage_array();
     // printf("The main function received %1.10lf and will keep it for a while\n", return_code);
 
-    printf("The main function received this array\n");
     unsigned long size = 0;
     double * arr = manage_array(&size);
+    printf("The main function received this array\n");
     for (int i = 0; i < size; ++i) {
       printf("%1.10lf\n", arr[i]);
     }
