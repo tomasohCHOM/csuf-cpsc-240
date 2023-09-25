@@ -1,5 +1,16 @@
 ; Author name: Tomas Oh
-; Author email: tomasoh@fullerton.edu
+; Author email: tomasoh@csu.fullerton.edu
+; Operating System: Ubuntu 22.04
+; For: Assignment 2 - Array Management System
+; Purpose of this file:
+;   This is the output_array.asm module that displays the array contents to standard
+;   output. It will loop through the elements in the array one by one and
+;   print them in a new line, using the printf function from the C library.
+;   This procedure is achieved through looping the elements with the condition
+;   that it will stop upon the nth time, where n is the number of user inputs 
+;   coming from input_array.asm, which precede this function.
+; Completion Date: 09/18/2023
+; Updated Date: 09/24/2023
 
 ;Declarations
 extern printf
@@ -7,6 +18,10 @@ global output_array
 
 segment .data
     number_in_array db "%1.10lf", 10, 0
+
+segment .bss
+    align   64
+    backup  resb 832
 
 segment .text
 
@@ -29,7 +44,11 @@ output_array:
     push    r15
     pushf
 
-    ;Registers rax, rip, and rsp are usually not backed up.
+    ;==== Perform State Component Backup ====
+    mov     rax, 7
+    mov     rdx, 0
+    xsave   [backup]
+    ;==== End State Component Backup ========
 
     ;Back up the incoming parameter
     mov     r14, rdi  ;r14 is the array
@@ -56,6 +75,13 @@ begin_loop:
     jmp     begin_loop
 
 done:
+    ;==== Perform State Component Restore ====
+    mov     rax, 7
+    mov     rdx, 0
+    xrstor  [backup]
+    ;==== End State Component Restore ========
+
+
     ;return 0 which is the traditional signal of success
     xor     rax, rax
 

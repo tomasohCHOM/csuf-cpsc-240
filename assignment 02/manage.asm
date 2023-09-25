@@ -1,5 +1,6 @@
 ; Author name: Tomas Oh
 ; Author email: tomasoh@csu.fullerton.edu
+; Operating System: Ubuntu 22.04
 ; For: Assignment 2 - Array Management System
 ; Purpose of this file:
 ;   This is the manage.asm module used to create an array of doubles using user input.
@@ -9,6 +10,7 @@
 ;   This assembly module will return an array of doubles, and will modify the parameter
 ;   coming from rdi to be the number of inputs from the user.
 ; Completion Date: 09/18/2023
+; Updated Date: 09/24/2023
 
 array_size equ 8
 
@@ -29,7 +31,8 @@ segment .data
     floatform     db "%lf", 0
 
 segment .bss
-    align   16
+    align   64
+    backup  resb 832
     array   resq array_size
 
 section .text
@@ -53,7 +56,11 @@ manage_array:
     push    r15
     pushf
 
-
+    ;==== Perform State Component Backup ====
+    mov         rax, 7
+    mov         rdx, 0
+    xsave       [backup]
+    ;==== End State Component Backup ========
 
     ; Show the initial messasges to the user
     mov qword   rax, 0
@@ -100,6 +107,12 @@ manage_array:
     mov         rdi, sum_numbers_message
     call        printf
 
+    ;==== Perform State Component Restore ====
+    mov         rax, 7
+    mov         rdx, 0
+    xrstor      [backup]
+    ;==== End State Component Restore ========
+
     ; Return a double which is the sum of the elements in the array
     ; OR for the challenge part, prepare to return the array itself 
     movsd       xmm0, xmm15
@@ -123,7 +136,7 @@ manage_array:
     pop     rbp
 
     ; Mutates the value of the parameter to the number of user inputs
-    mov qword [rdi], rax
-    mov rax, array    ; Return the array to the C module
+    mov     qword [rdi], rax
+    mov     rax, array    ; Return the array to the C module
 
     ret

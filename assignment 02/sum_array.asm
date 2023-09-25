@@ -1,10 +1,25 @@
 ; Author name: Tomas Oh
-; Author email: tomasoh@fullerton.edu
+; Author email: tomasoh@csu.fullerton.edu
+; Operating System: Ubuntu 22.04
+; For: Assignment 2 - Array Management System
+; Purpose of this file:
+;   This is the sum.asm module that is in charge of summing all the elements
+;   in the array and returning them as a single floting-point number. Like
+;   output_array.asm, we use a loop to walk through each of our elements in the
+;   array, adding its value to the main sum, until there are no more elements.
+;   However, unlike output_array.asm, we are not displaying anything to the user,
+;   since that is taken charge by the manage.asm module.
+; Completion Date: 09/18/2023
+; Updated Date: 09/24/2023
 
 ;Declarations
 global sum_array
 
 segment .data
+
+segment .bss
+    align   64
+    backup  resb 832
 
 segment .text
 
@@ -27,7 +42,11 @@ sum_array:
     push    r15
     pushf
 
-    ;Registers rax, rip, and rsp are usually not backed up.
+    ;==== Perform State Component Backup ====
+    mov     rax, 7
+    mov     rdx, 0
+    xsave   [backup]
+    ;==== End State Component Backup ========
 
     ;Back up the incoming parameter
     mov     r14, rdi  ;r14 is the array
@@ -48,6 +67,21 @@ begin_loop:
     jmp     begin_loop
 
 done:
+    ; Push xmm8
+    ; We do this step because after state component restore, xmm values are wiped
+    sub     rsp, 8
+    movsd  qword [rsp], xmm8
+
+    ;==== Perform State Component Restore ====
+    mov     rax, 7
+    mov     rdx, 0
+    xrstor  [backup]
+    ;==== End State Component Restore ========
+
+    ; Pop xmm8
+    movsd   xmm8, qword [rsp]
+    add     rsp, 8
+
     ; Move the calculated sum to xmm0
     movsd   xmm0, xmm8
 

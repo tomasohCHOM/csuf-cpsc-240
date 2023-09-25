@@ -1,15 +1,27 @@
 ; Author name: Tomas Oh
-; Author email: tomasoh@fullerton.edu
+; Author email: tomasoh@csu.fullerton.edu
+; Operating System: Ubuntu 22.04
+; For: Assignment 2 - Array Management System
+; Purpose of this file:
+;   This is the input_array.asm module that takes user input and
+;   fills the array with floating point numbers FROM that user input.
+;   It uses the help of scanf from the C library and will ask for input
+;   up to the 8th element (because our array has a capacity of 8). Furthermore,
+;   if the user inputs ctrl-d, the loop will finish immediately and take in
+;   the numbers inputted prior.
+; Completion Date: 09/18/2023
+; Updated Date: 09/24/2023
 
 extern scanf
-extern printf
-
 global input_array
 
 segment .data
     floatform db "%lf", 0
-    debug     db "The inputted number is: %1.18lf", 10, 0
-    string_format db "%s", 0
+
+; Used for state component backup/restore
+segment .bss
+    align   64
+    backup  resb 832
 
 segment .text
 
@@ -32,17 +44,18 @@ input_array:
     push    r15
     pushf
 
-    ; mov rax, 0
-    ; mov rdi, string_format
-    ; mov rsi, debug
-    ; call printf
+    ;==== Perform State Component Backup ====
+    mov         rax, 7
+    mov         rdx, 0
+    xsave       [backup]
+    ;==== End State Component Backup ========
 
-    push qword 0
+    push qword  0
 
-    mov     r14, rdi    ; r14 is the array
-    mov     r15, rsi    ; r15 is the upper-limit of the number of cells in the array
-    xor     r13, r13    ; r13 to count input
-    jmp     input_number
+    mov         r14, rdi    ; r14 is the array
+    mov         r15, rsi    ; r15 is the upper-limit of the number of cells in the array
+    xor         r13, r13    ; r13 to count input
+    jmp         input_number
 
 ; A loop that will keep asking for more floating-point numbers until
 ; the user presses ctrl-d
@@ -65,37 +78,43 @@ input_number:
     pop         r8
     je          input_finished
 
-    pop rax
+    pop         rax
 
     ; r14 is the address of the array. r13 is like the "index"
     ; of the array. By multiplying r13 * 8, we move 8 bytes to the
     ; next iteration to input more numbers.
-    mov     [r14 + r13*8], r8
-    inc     r13
-    push rax
-    jmp     input_number
+    mov         [r14 + r13*8], r8
+    inc         r13
+    push        rax
+    jmp         input_number
 
 input_finished:
+    ;==== Perform State Component Restore ====
+    mov     rax, 7
+    mov     rdx, 0
+    xrstor  [backup]
+    ;==== End State Component Restore ========
+
     ; r13 holds the count of numbers in the array.
     ; Move it to rax as we are required to return that number.
-    pop rax
+    pop     rax
     mov     rax, r13
 
     ; Restoring the original value to the GPRs
     popf
-    pop    r15
-    pop    r14
-    pop    r13
-    pop    r12
-    pop    r11
-    pop    r10
-    pop    r9
-    pop    r8
-    pop    rdi
-    pop    rsi
-    pop    rdx
-    pop    rcx
-    pop    rbx
-    pop    rbp
+    pop     r15
+    pop     r14
+    pop     r13
+    pop     r12
+    pop     r11
+    pop     r10
+    pop     r9
+    pop     r8
+    pop     rdi
+    pop     rsi
+    pop     rdx
+    pop     rcx
+    pop     rbx
+    pop     rbp
 
     ret
