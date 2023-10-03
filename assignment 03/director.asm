@@ -21,11 +21,13 @@ extern sum_array    ; external function from the assembly module sum.asm
 global manage_array
 
 segment .data
-    initial_message       db "We will take care of all your array needs.", 10, 0
-    input_numbers_message db "Please input float numbers separated by ws. After the last number press ws followed by control-d.", 10, 0
-    show_numbers_message  db "Thank you. The numbers in the array are:", 10, 0
-    sum_numbers_message   db "The sum of the numbers in the array is %lf", 10, 0
-    concluding_message    db "Thank you for using Array Management System", 10, 0
+    initial_message             db "This program will sort all of your doubles.", 10, 0
+    input_numbers_message       db "Please enter floating point numbers separated by white space. After the last numeric input enter at least one more white space and press cntl+d.", 10, 0
+    show_numbers_message        db "Thank you. You entered these numbers:", 10, 0
+    end_show_numbers_message    db "End of output of array.", 10, 0
+    start_sort_message          db "The array is now being sorted without moving any numbers.", 10, 0
+    end_sort_message            db "The data in the array are now ordered as follows:", 10, 0
+    concluding_message          db "The array will be sent back to the caller function.", 10, 0
 
     string_format db "%s", 0
     floatform     db "%lf", 0
