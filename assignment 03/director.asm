@@ -30,9 +30,9 @@
 array_size equ 8
 
 extern printf       ; external C function to write to standard output
-extern input_array  ; external function from the assembly module input_array.asm
-extern output_array ; external function from the assembly module output_array.asm
-extern sum_array    ; external function from the assembly module sum.asm   
+extern input_array  ; external function from the assembly module inputarray.asm
+extern output_array ; external function from the assembly module outputarray.asm
+extern sort_array   ; external function from the assembly module sortpointers.cpp  
 global manage_array
 
 segment .data

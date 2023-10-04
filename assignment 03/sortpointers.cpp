@@ -26,3 +26,17 @@
 // Purpose of this file:
 //    This is the C driver that contains the start code and which calls the
 //    assembly function director from director.asm.
+
+extern "C" void sort_pointers(double*, unsigned long);
+
+void sort_pointers(double *array, unsigned long size) {
+    for (int i = 0; i < size; ++i) {
+        for (int j = 0; i < size - i - 1; ++j) {
+            if(*(current[j]) > *(current[j + 1])) {
+                double temp = *(current[j]);
+                *(current[j]) = *(current[j + 1]);
+                *(current[j + 1]) = temp
+            }
+        }
+    } 
+}
