@@ -31,13 +31,13 @@ array_size equ 8
 
 extern printf         ; external C function to write to standard output
 extern input_array    ; external function from the assembly module inputarray.asm
-extern output_array   ; external function from the assembly module outputarray.asm
+extern output_array   ; external function from the assembly module outputarray.c
 extern sort_pointers  ; external function from the assembly module sortpointers.cpp  
 global manage_array
 
 segment .data
     initial_message             db "This program will sort all of your doubles.", 10, 0
-    input_numbers_message       db "Please enter floating point numbers separated by white space. After the last numeric input enter at least one more white space and press cntl+d.", 10, 0
+    input_numbers_message       db "Please enter floating point numbers separated by white space. After the last numeric input enter at least one more white space and press ctrl+d.", 10, 0
     show_numbers_message        db "Thank you. You entered these numbers:", 10, 0
     end_show_numbers_message    db "End of output of array.", 10, 0
     start_sort_message          db "The array is now being sorted without moving any numbers.", 10, 0

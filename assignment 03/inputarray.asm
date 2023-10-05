@@ -66,8 +66,6 @@ input_array:
     xsave       [backup]
     ;==== End State Component Backup ========
 
-    push qword  0
-
     mov         r14, rdi    ; r14 is the array
     mov         r15, rsi    ; r15 is the upper-limit of the number of cells in the array
     xor         r13, r13    ; r13 to count input
@@ -90,14 +88,12 @@ input_number:
     ; Read a floating point number from user
     mov         rax, 0
     mov         rdi, floatform
-    push qword  0
     mov         rsi, r12
     call        scanf       ; either a float number or ctrl-d
 
     ; Checks if the user has inputted ctrl-d and finished the job
     cdqe
     cmp         rax, -1
-    pop         r12
     je          input_finished
 
     ; r14 is the address of the array. r13 is like the "index"
@@ -116,7 +112,6 @@ input_finished:
 
     ; r13 holds the count of numbers in the array.
     ; Move it to rax as we are required to return that number.
-    pop     rax
     mov     rax, r13
 
     ; Restoring the original value to the GPRs
