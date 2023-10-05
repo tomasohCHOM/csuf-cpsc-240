@@ -1,6 +1,6 @@
 ; Program name: "Sort by Pointers." This program demonstrates the input of
 ; array values as pointers and the sorting of its elements (pointers) based
-; off its values. Copyright (C) 2023 Tomas Oh
+; off its values (floating-point numbers). Copyright (C) 2023 Tomas Oh.
 ;
 ; "Sort by Pointers" is free software: you can redistribute it and/or modify
 ; it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@
 ;    This is the C driver that contains the start code and which calls the
 ;    assembly function director from director.asm.
 
-array_size equ 8
+array_size equ 10
 
 extern printf         ; external C function to write to standard output
 extern input_array    ; external function from the assembly module inputarray.asm

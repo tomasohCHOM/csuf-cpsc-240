@@ -1,6 +1,6 @@
 ; Program name: "Sort by Pointers." This program demonstrates the input of
 ; array values as pointers and the sorting of its elements (pointers) based
-; off its values. Copyright (C) 2023 Tomas Oh
+; off its values (floating-point numbers). Copyright (C) 2023 Tomas Oh.
 ;
 ; "Sort by Pointers" is free software: you can redistribute it and/or modify
 ; it under the terms of the GNU General Public License as published by

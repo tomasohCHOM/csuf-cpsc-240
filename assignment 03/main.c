@@ -1,6 +1,6 @@
 // Program name: "Sort by Pointers." This program demonstrates the input of
 // array values as pointers and the sorting of its elements (pointers) based
-// off its values. Copyright (C) 2023 Tomas Oh
+// off its values (floating-point numbers). Copyright (C) 2023 Tomas Oh.
 //
 // "Sort by Pointers" is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -29,15 +29,15 @@
 
 #include "stdio.h"
 
-extern double *manage_array(unsigned long *n);
+extern double ** manage_array(unsigned long *n);
 
 int main() {
     printf("Welcome to a great program developed by Tomas Oh.\n\n");
     unsigned long size = 0;
-    double *arr = manage_array(&size);
+    double **arr = manage_array(&size);
     printf("The main function received this set of numbers:\n");
     for (int i = 0; i < size; ++i) {
-        printf("%1.10lf\n", arr[i]);
+        printf("%1.10lf\n", *(arr[i]));
     }
     printf("Main will keep these and send a zero to the operating system.\n");
     return 0;
