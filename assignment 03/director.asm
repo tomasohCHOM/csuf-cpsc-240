@@ -29,10 +29,10 @@
 
 array_size equ 8
 
-extern printf       ; external C function to write to standard output
-extern input_array  ; external function from the assembly module inputarray.asm
-extern output_array ; external function from the assembly module outputarray.asm
-extern sort_array   ; external function from the assembly module sortpointers.cpp  
+extern printf         ; external C function to write to standard output
+extern input_array    ; external function from the assembly module inputarray.asm
+extern output_array   ; external function from the assembly module outputarray.asm
+extern sort_pointers  ; external function from the assembly module sortpointers.cpp  
 global manage_array
 
 segment .data
@@ -111,17 +111,46 @@ manage_array:
     mov         rsi, r13
     call        output_array
 
-    ; Print a message that it will sum each of the numbers in the array
+    ; Message that displays "End of ouput of array."
+    mov         rax, 0
+    mov         rdi, string_format
+    mov         rsi, end_show_numbers_message
+    call        printf
+
+    ; Print a message that it will start sorting by pointers 
+    mov         rax, 0
+    mov         rdi, string_format
+    mov         rsi, start_sort_message
+    call        printf
+
+    ; Call the sort_pointers function that sorts the array by pointers
     mov         rax, 0
     mov         rdi, array
     mov         rsi, r13
-    call        sum_array
-    ; Move the result to a safe register (xmm15)
-    movsd       xmm15, xmm0
+    call        sort_pointers
 
-    ; Print the result to the user
-    mov         rax, 1
-    mov         rdi, sum_numbers_message
+    ; Print that the program has finished sorting the array by pointers
+    mov         rax, 0
+    mov         rsi, string_format
+    mov         rdi, end_sort_message
+    call        printf
+
+    ; Print the now sorted elements using the function output_array
+    mov         rax, 0
+    mov         rdi, array
+    mov         rsi, r13
+    call        output_array
+
+    ; Message that displays "End of ouput of array."
+    mov         rax, 0
+    mov         rdi, string_format
+    mov         rsi, end_show_numbers_message
+    call        printf
+
+    ; Last message before returning to main.c.
+    mov         rax, 0
+    mov         rdi, string_format
+    mov         rsi, concluding_message
     call        printf
 
     ;==== Perform State Component Restore ====
@@ -130,9 +159,8 @@ manage_array:
     xrstor      [backup]
     ;==== End State Component Restore ========
 
-    ; Return a double which is the sum of the elements in the array
-    ; OR for the challenge part, prepare to return the array itself 
-    movsd       xmm0, xmm15
+    ; Prepare to return the array to main.c
+    ; The array is filled with floating-point numbers and it is sorted
     mov         rax, r13    ; We need to move the value of r13 to rax because r13 will be restored
 
     ; Restoring the original value to the General Purpose Registers

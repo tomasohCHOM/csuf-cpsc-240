@@ -24,15 +24,16 @@
 // Operating System: Ubuntu 22.04
 // For: Assignment 3 - Sort By Pointers
 // Purpose of this file:
-//    This is the C driver that contains the start code and which calls the
-//    assembly function director from director.asm.
+//    This C file contains the output_array function, which loops through
+//    the provided array and prints them to standard output. Dereferencing
+//    is need because we are provided with an array of double pointers.
 
 #include <stdio.h>
 
-extern void output_array(double *, unsigned long);
+extern void output_array(double *[], unsigned long);
 
-void output_array(double *array, unsigned long n) {
-  for (int i = 0; i < n; ++i) {
+void output_array(double *arr[], unsigned long n) {
+  for (unsigned long i = 0; i < n; ++i) {
     printf("%1.10lf\n", *(arr[i]));
   }
 }

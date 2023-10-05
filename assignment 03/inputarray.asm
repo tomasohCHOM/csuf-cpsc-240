@@ -28,6 +28,7 @@
 ;    assembly function director from director.asm.
 
 extern scanf
+extern malloc
 global input_array
 
 segment .data
@@ -75,32 +76,35 @@ input_array:
 ; A loop that will keep asking for more floating-point numbers until
 ; the user presses ctrl-d
 input_number:
-    ; if the current index (r13) is greater than or equal to 
+    ; If the current index (r13) is greater than or equal to 
     ; the upper-limit (r15), conclude the loop.
     cmp         r13, r15
     jge         input_finished
+
+    ; Create storage for one new number
+    mov         rax, 0
+    mov         rdi, 8
+    call        malloc
+    mov         r12, rax ; r12 = pointer to qword
 
     ; Read a floating point number from user
     mov         rax, 0
     mov         rdi, floatform
     push qword  0
-    mov         rsi, rsp
+    mov         rsi, r12
     call        scanf       ; either a float number or ctrl-d
 
-    ; Checks if the user has inputted ctrl-d and finishes the job
+    ; Checks if the user has inputted ctrl-d and finished the job
     cdqe
     cmp         rax, -1
-    pop         r8
+    pop         r12
     je          input_finished
-
-    pop         rax
 
     ; r14 is the address of the array. r13 is like the "index"
     ; of the array. By multiplying r13 * 8, we move 8 bytes to the
     ; next iteration to input more numbers.
-    mov         [r14 + r13*8], r8
+    mov         [r14 + r13*8], r12
     inc         r13
-    push        rax
     jmp         input_number
 
 input_finished:

@@ -29,13 +29,13 @@
 
 extern "C" void sort_pointers(double*, unsigned long);
 
-void sort_pointers(double *array, unsigned long size) {
-    for (int i = 0; i < size; ++i) {
-        for (int j = 0; i < size - i - 1; ++j) {
-            if(*(current[j]) > *(current[j + 1])) {
-                double temp = *(current[j]);
-                *(current[j]) = *(current[j + 1]);
-                *(current[j + 1]) = temp
+void sort_pointers(double *arr, unsigned long size) {
+    for (unsigned long i = 0; i < size; ++i) {
+        for (unsigned long j = 0; i < size - i - 1; ++j) {
+            if(*(arr + j) > *(arr + j + 1)) {
+                double temp = *(arr + j);
+                *(arr + j) = *(arr + j + 1);
+                *(arr + j + 1) = temp;
             }
         }
     } 
