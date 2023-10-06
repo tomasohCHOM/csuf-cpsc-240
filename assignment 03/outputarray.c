@@ -33,7 +33,7 @@
 extern void output_array(double *[], unsigned long);
 
 void output_array(double *arr[], unsigned long n) {
-  for (unsigned long i = 0; i < n; ++i) {
-    printf("%1.10lf\n", *(arr[i]));
-  }
+    for (unsigned long i = 0; i < n; ++i) {
+      printf("%1.10lf\n", *(arr[i]));
+    }
 }

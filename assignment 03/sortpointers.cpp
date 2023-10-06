@@ -33,15 +33,14 @@ extern "C" void sort_pointers(double*[], unsigned long);
 
 void sort_pointers(double *arr[], unsigned long size) {
     bool swapped;
-    printf("Hello?\n");
     for (unsigned long i = 0; i < size; ++i) {
         swapped = false;
         for (unsigned long j = 0; j < size - i - 1; ++j) {
             if(*(arr[j]) > *(arr[j + 1])) {
                 // Swap arr[j] and arr[j + 1]
-                double temp = *(arr[j]);
-                *(arr[j]) = *(arr[j + 1]);
-                *(arr[j + 1]) = temp;
+                double *temp = arr[j];
+                arr[j] = arr[j + 1];
+                arr[j + 1] = temp;
                 swapped = true;
             }
         }

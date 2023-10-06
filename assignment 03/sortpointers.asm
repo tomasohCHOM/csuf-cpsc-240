@@ -36,7 +36,7 @@ segment .bss
 
 segment .text
 
-input_array:
+sort_pointers:
     ; Back up all the GPRs
     push    rbp
     mov     rbp, rsp
@@ -56,9 +56,9 @@ input_array:
     pushf
 
     ;==== Perform State Component Backup ====
-    mov         rax, 7
-    mov         rdx, 0
-    xsave       [backup]
+    mov     rax, 7
+    mov     rdx, 0
+    xsave   [backup]
     ;==== End State Component Backup ========
 
     mov         r14, rdi    ; r14 is the array
@@ -68,7 +68,48 @@ input_array:
     jmp         outerloop
 
 outerloop:
-    
+    cmp         r13, r15
+    jge         done
+
+    ; The following change the condition every loop
+    mov         r12, r15
+    sub         r12, 1
+    sub         r12, r13
+    xor         r11, r11
+
+innerloop:
+    cmp         r11, r12 ; Go to the next outer increment if the inner index reaches the condition
+    jge         increment
+
+    mov         rcx, r11
+    inc         rcx ; RCX contains the inner counter index + 1
+    mov         r10, [r14 + r11*8] ; r10 contains the pointer to the first value
+    mov         r9, [r14 + rcx*8] ; r9 contains the pointer to the next value
+
+    ; Load values from memory before comparing
+    movsd       xmm8, [r10]
+    movsd       xmm9, [r9]
+
+    ; Compare the values pointed to by r10 and r9
+    ucomisd     xmm8, xmm9
+    jbe         skip ; Jump if xmm8 <= xmm9
+
+    movsd [r10], xmm8
+    movsd [r9], xmm9
+
+    ; Swap values in memory if xmm8 > xmm9
+    ; mov         r8, r10
+    ; mov         r10, r9
+    ; mov         r9, r8
+
+skip:
+    inc         r11
+    jmp         innerloop
+
+; Incrementing counters
+increment:
+    inc         r13 ; Increment the counter
+    jmp         outerloop
 
 done:
     ;==== Perform State Component Restore ====
@@ -76,10 +117,6 @@ done:
     mov     rdx, 0
     xrstor  [backup]
     ;==== End State Component Restore ========
-
-    ; r13 holds the count of numbers in the array.
-    ; Move it to rax as we are required to return that number.
-    mov     rax, r13
 
     ; Restoring the original value to the GPRs
     popf
