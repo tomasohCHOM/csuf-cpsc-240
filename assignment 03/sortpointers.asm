@@ -18,14 +18,23 @@
 ; Author name: Tomas Oh
 ; Author email: tomasoh@csu.fullerton.edu
 ; C.W.I.D.: 885566877
+; Section: CPSC 240-03
+; For: Assignment 3 - Sort By Pointers
 ; Due Date: 10/09/2023
 ; Completion Date: 10/06/2023
 ; Updated Date: 10/06/2023
 ; Operating System: Ubuntu 22.04
-; For: Assignment 3 - Sort By Pointers
-; Purpose of this file:
-;    This is the C driver that contains the start code and which calls the
-;    assembly function director from director.asm.
+; This file
+;   File name: sortpointers.asm
+;   Language: X86 with Intel syntax.
+;   Purpose:
+;       This assembly module is responsible for sorting the elements in
+;       an array based on their pointers, rather than the floating-point
+;       values themselves. The sorting method used is bubble sort and the
+;       steps for it are outlined in blocks of comments throughout the code.
+;       Additionally, the author chooses to refer to some of the registers
+;       as if they were C++ variables because the same function is done in that
+;       language.
 
 global sort_pointers
 

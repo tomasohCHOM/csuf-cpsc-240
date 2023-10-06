@@ -18,22 +18,28 @@
 // Author name: Tomas Oh
 // Author email: tomasoh@csu.fullerton.edu
 // C.W.I.D.: 885566877
-// Due Date: 10/09/2023
-// Completion Date: -/-/2023
-// Updated Date: -/-/2023
-// Operating System: Ubuntu 22.04
+// Section: CPSC 240-03
 // For: Assignment 3 - Sort By Pointers
-// Purpose of this file:
-//    This C file contains the output_array function, which loops through
-//    the provided array and prints them to standard output. Dereferencing
-//    is need because we are provided with an array of double pointers.
+// Due Date: 10/09/2023
+// Completion Date: 10/06/2023
+// Updated Date: 10/06/2023
+// Operating System: Ubuntu 22.04
+// This file
+//   File name: outputarray.c
+//   Language: C
+//   Purpose:
+//      This C file contains the output_array function, which loops through
+//      the provided array and prints its values to standard output. Dereferencing
+//      is needed because we are provided with an array of double pointers.
 
 #include <stdio.h>
 
 extern void output_array(double *[], unsigned long);
 
-void output_array(double *arr[], unsigned long n) {
-    for (unsigned long i = 0; i < n; ++i) {
+// Prints the contents of the array by dereferencing the value pointed at
+// each element of the array.
+void output_array(double *arr[], unsigned long size) {
+    for (unsigned long i = 0; i < size; ++i) {
       printf("%1.10lf\n", *(arr[i]));
     }
 }

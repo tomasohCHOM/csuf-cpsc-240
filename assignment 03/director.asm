@@ -18,14 +18,24 @@
 ; Author name: Tomas Oh
 ; Author email: tomasoh@csu.fullerton.edu
 ; C.W.I.D.: 885566877
-; Due Date: 10/09/2023
-; Completion Date: -/-/2023
-; Updated Date: -/-/2023
-; Operating System: Ubuntu 22.04
+; Section: CPSC 240-03
 ; For: Assignment 3 - Sort By Pointers
-; Purpose of this file:
-;    This is the C driver that contains the start code and which calls the
-;    assembly function director from director.asm.
+; Due Date: 10/09/2023
+; Completion Date: 10/06/2023
+; Updated Date: 10/06/2023
+; Operating System: Ubuntu 22.04
+;This file
+;   File name: director.asm
+;   Language: X86 with Intel syntax.
+;   Purpose:
+;       This assembly module is designated as the root for every operation
+;       done in the program "Sort by Pointers." It calls every other function
+;       that is in charge for filling, mutating, and sorting an array of provided
+;       capacity equal to 10 elements. More specifically, it calls the functions
+;       input_array (X86), output_array (C++), and sort_pointers (C++ for baseline,
+;       X86 for the challenge portion of the assignment), and returns an array of 
+;       double pointers to the C driver, modifying the parameter coming from
+;       rdi to be the number of inputs from the user (the size of the array).
 
 array_size equ 10
 
@@ -33,7 +43,7 @@ extern printf         ; external C function to write to standard output
 extern input_array    ; external function from the assembly module inputarray.asm
 extern output_array   ; external function from the assembly module outputarray.c
 extern sort_pointers  ; external function from the assembly module sortpointers.cpp  
-global manage_array
+global director
 
 segment .data
     initial_message             db "This program will sort all of your doubles.", 10, 0
@@ -54,7 +64,7 @@ segment .bss
 
 section .text
 
-manage_array:
+director:
     ; Backup all General Purpose Registers
     push    rbp
     mov     rbp, rsp

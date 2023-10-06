@@ -18,14 +18,20 @@
 ; Author name: Tomas Oh
 ; Author email: tomasoh@csu.fullerton.edu
 ; C.W.I.D.: 885566877
-; Due Date: 10/09/2023
-; Completion Date: -/-/2023
-; Updated Date: -/-/2023
-; Operating System: Ubuntu 22.04
+; Section: CPSC 240-03
 ; For: Assignment 3 - Sort By Pointers
-; Purpose of this file:
-;    This is the C driver that contains the start code and which calls the
-;    assembly function director from director.asm.
+; Due Date: 10/09/2023
+; Completion Date: 10/06/2023
+; Updated Date: 10/06/2023
+; Operating System: Ubuntu 22.04
+;This file
+;   File name: inputarray.asm
+;   Language: X86 with Intel syntax.
+;   Purpose:
+;       This assembly module is responsible for managing user input and
+;       filling the array with pointers to those values, rather than filling
+;       the array with those values themselves (made possible by using malloc
+;       and scanf from the C library)
 
 extern scanf
 extern malloc

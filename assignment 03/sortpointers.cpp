@@ -18,14 +18,22 @@
 // Author name: Tomas Oh
 // Author email: tomasoh@csu.fullerton.edu
 // C.W.I.D.: 885566877
+// Section: CPSC 240-03
+// For: Assignment 3 - Sort By Pointers
 // Due Date: 10/09/2023
 // Completion Date: 10/06/2023
 // Updated Date: 10/06/2023
 // Operating System: Ubuntu 22.04
-// For: Assignment 3 - Sort By Pointers
-// Purpose of this file:
-//    This is the C driver that contains the start code and which calls the
-//    assembly function director from director.asm.
+// This file
+//   File name: sortpointers.cpp
+//   Language: C++
+//   Purpose:
+//      This C++ file contains the function sort_pointers, which takes in
+//      an array and a size as parameters and sorts its elements in ascending
+//      order. Rather than sorting based on the floating-point values, since
+//      the array consists of double pointers, it will only move the pointers
+//      themselves. The function is implemented using bubble sort with a time
+//      complexity (worst-case scenario) of O(n^2) and space complexity of O(1).
 
 extern "C" void sort_pointers(double*[], unsigned long);
 

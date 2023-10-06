@@ -18,23 +18,28 @@
 // Author name: Tomas Oh
 // Author email: tomasoh@csu.fullerton.edu
 // C.W.I.D.: 885566877
-// Due Date: 10/09/2023
-// Completion Date: -/-/2023
-// Updated Date: -/-/2023
-// Operating System: Ubuntu 22.04
+// Section: CPSC 240-03
 // For: Assignment 3 - Sort By Pointers
-// Purpose of this file:
-//    This is the C driver that contains the start code and which calls the
-//    assembly function director from director.asm.
+// Due Date: 10/09/2023
+// Completion Date: 10/06/2023
+// Updated Date: 10/06/2023
+// Operating System: Ubuntu 22.04
+// This file
+//   File name: main.c
+//   Language: C
+//   Purpose:
+//      This is the C driver that contains the starter code and which calls the
+//      assembly function director from director.asm. It will also print the contents
+//      of the returned array before exiting the program.
 
 #include "stdio.h"
 
-extern double ** manage_array(unsigned long *n);
+extern double ** director(unsigned long *n);
 
 int main() {
     printf("Welcome to a great program developed by Tomas Oh.\n\n");
     unsigned long size = 0;
-    double **arr = manage_array(&size);
+    double **arr = director(&size);
     printf("The main function received this set of numbers:\n");
     for (int i = 0; i < size; ++i) {
         printf("%1.10lf\n", *(arr[i]));
