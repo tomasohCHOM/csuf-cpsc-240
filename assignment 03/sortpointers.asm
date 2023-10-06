@@ -19,8 +19,8 @@
 ; Author email: tomasoh@csu.fullerton.edu
 ; C.W.I.D.: 885566877
 ; Due Date: 10/09/2023
-; Completion Date: -/-/2023
-; Updated Date: -/-/2023
+; Completion Date: 10/06/2023
+; Updated Date: 10/06/2023
 ; Operating System: Ubuntu 22.04
 ; For: Assignment 3 - Sort By Pointers
 ; Purpose of this file:
@@ -62,54 +62,69 @@ sort_pointers:
     ;==== End State Component Backup ========
 
     mov         r14, rdi    ; r14 is the array
-    mov         r15, rsi    ; r15 is the upper-limit of the number of cells in the array
-    xor         r13, r13    ; r13 is the outer counter
-    xor         r12, r12    ; r12 is the inner counter
-    jmp         outerloop
+    mov         r15, rsi    ; r15 is the number of elements in the array
+    xor         r13, r13    ; r13 is the limit of the outer loop's condition
+    xor         r12, r12    ; r12 is the limit of the inner loop's condition
+    jmp         outer_loop
 
-outerloop:
+; This is the outerloop of the sort_pointers function. It looks through the
+outer_loop:
+    ; If r13 >= r15, exit the loops and we are done
+    ; Equivalent to the loop condition i < size in sortpointers.cpp
     cmp         r13, r15
     jge         done
 
-    ; The following change the condition every loop
+    ; r12 is equivalent to j = size - i - 1 in sortpointers.cpp
     mov         r12, r15
     sub         r12, 1
     sub         r12, r13
+
+    ; r11 is initialized to 0
     xor         r11, r11
+    jmp         inner_loop
 
-innerloop:
-    cmp         r11, r12 ; Go to the next outer increment if the inner index reaches the condition
-    jge         increment
+inner_loop:
+    ; If r11 >= r12, exit the inner loop and go to the next outer loop iteration
+    ; Equivalent to the loop condition j < size - i - 1 in sortpointers.cpp
+    cmp         r11, r12
+    jge         increment_outer
 
-    mov         rcx, r11
-    inc         rcx ; RCX contains the inner counter index + 1
-    mov         r10, [r14 + r11*8] ; r10 contains the pointer to the first value
-    mov         r9, [r14 + rcx*8] ; r9 contains the pointer to the next value
+    ; r10 contains the pointer to the first value (arr[j] in sortpointers.cpp)
+    mov         r10, [r14 + r11*8]
+    ; r9 contains the pointer to the value immediately after (arr[j + 1] in sortpointers.cpp)
+    mov         r9, [r14 + r11*8 + 8]
 
-    ; Load values from memory before comparing
+    ; Load the floating-pint values from memory before comparing
+    ; xmm8 = *(arr[j]) in sortpointers.cpp
     movsd       xmm8, [r10]
+    ; xmm9 = *(arr[j + 1]) in sortpointers.cpp
     movsd       xmm9, [r9]
 
-    ; Compare the values pointed to by r10 and r9
+    ; Compare the values pointed to by r10 and r9. If xmm8 <= xmm9, we skip swapping
+    ; Equivalent to the condition *(arr[j]) > *(arr[j + 1]) in sortpointers.cpp
+    ; This case, it would be *(arr[j]) <= *(arr[j + 1]) to skip swapping
     ucomisd     xmm8, xmm9
-    jbe         skip ; Jump if xmm8 <= xmm9
+    jbe         increment_inner
 
-    movsd [r10], xmm8
-    movsd [r9], xmm9
+    ; Perform the swapping of pointers
+    ;Set array[j] to array[j + 1]
+    mov [r14 + r11*8], r9
+    ;Set array[j + 1] to original value of array[j]
+    mov [r14 + r11*8 + 8], r10
 
-    ; Swap values in memory if xmm8 > xmm9
-    ; mov         r8, r10
-    ; mov         r10, r9
-    ; mov         r9, r8
+    ; We are done with swapping at this pointer
+    ; Now we increment the inner counter and proceed to the next iteration of inner loop
+    jmp         increment_inner
 
-skip:
+
+increment_inner:
     inc         r11
-    jmp         innerloop
+    jmp         inner_loop
 
 ; Incrementing counters
-increment:
+increment_outer:
     inc         r13 ; Increment the counter
-    jmp         outerloop
+    jmp         outer_loop
 
 done:
     ;==== Perform State Component Restore ====

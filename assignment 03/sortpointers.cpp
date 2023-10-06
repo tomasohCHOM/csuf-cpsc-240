@@ -19,15 +19,13 @@
 // Author email: tomasoh@csu.fullerton.edu
 // C.W.I.D.: 885566877
 // Due Date: 10/09/2023
-// Completion Date: -/-/2023
-// Updated Date: -/-/2023
+// Completion Date: 10/06/2023
+// Updated Date: 10/06/2023
 // Operating System: Ubuntu 22.04
 // For: Assignment 3 - Sort By Pointers
 // Purpose of this file:
 //    This is the C driver that contains the start code and which calls the
 //    assembly function director from director.asm.
-#include <stdio.h>
-
 
 extern "C" void sort_pointers(double*[], unsigned long);
 
