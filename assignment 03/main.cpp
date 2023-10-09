@@ -26,24 +26,24 @@
 // Operating System: Ubuntu 22.04
 // This file
 //   File name: main.c
-//   Language: C
+//   Language: C++
 //   Purpose:
-//      This is the C driver that contains the starter code and which calls the
+//      This is the C++ driver that contains the starter code and which calls the
 //      assembly function director from director.asm. It will also print the contents
 //      of the returned array before exiting the program.
 
-#include "stdio.h"
+#include <iostream>
 
-extern double ** director(unsigned long *n);
+extern "C" double ** director(unsigned long *n);
 
 int main() {
-    printf("Welcome to a great program developed by Tomas Oh.\n\n");
+    std::cout << "\nWelcome to a great program developed by Tomas Oh.\n\n";
     unsigned long size = 0;
     double **arr = director(&size);
-    printf("The main function received this set of numbers:\n");
-    for (int i = 0; i < size; ++i) {
-        printf("%1.10lf\n", *(arr[i]));
+    std::cout << "The main function received this set of numbers:\n";
+    for (unsigned long i = 0; i < size; ++i) {
+        std::cout << *(arr[i]) << "\n";
     }
-    printf("Main will keep these and send a zero to the operating system.\n");
+    std::cout << "Main will keep these and send a zero to the operating system.\n";
     return 0;
 }
