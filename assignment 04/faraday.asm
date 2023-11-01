@@ -4,6 +4,7 @@
 extern printf       ; external C++ function to write to standard output
 extern scanf        ; external C++ function to read from standard input
 extern fgets
+extern stdin
 extern strlen
 extern atof
 extern isfloat
@@ -14,13 +15,13 @@ segment .data
     ; Declare some messages to the users
     name_prompt_message         db "Please enter your name: ", 0
     title_prompt_message        db "Please enter your title or profession: ", 0
-    welcome_message             db "We always welcome a card player to our electrical lab.", 10, 0
+    welcome_message             db "We always welcome a %s to our electrical lab.", 10, 0
     voltage_prompt_message      db "Please enter the voltage of the electrical system at your site (volts): ", 0
     resistance_prompt_message   db "Please enter the electrical resistance in the system at your site (ohms): ", 0
     time_prompt_message         db "Please enter the time your system was operating (seconds): ", 0
-    calculation_message         db "Thank you card player. We at Majestic are pleased to inform you that your system performed %lf joules of work.", 10, 10, 0
-    congratulations_message     db "Congratulations Diego de Las Vegas. Come back any time and make use of our software.", 10, 0
-    final_message               db "Everyone with title card player is welcome to use our programs at a reduced price.", 10, 10, 0
+    calculation_message         db "Thank you %s. We at Majestic are pleased to inform you that your system performed %lf joules of work.", 10, 10, 0
+    congratulations_message     db "Congratulations %s. Come back any time and make use of our software.", 10, 0
+    final_message               db "Everyone with title %s is welcome to use our programs at a reduced price.", 10, 10, 0
     
     negative_message    db  "You inputted a negative or 0 as a number.", 10, 0
     greater_num_message db  "You inputted a number greater than or equal to the number of miles.", 10, 0
@@ -65,6 +66,52 @@ faraday:
     mov         rdx, 0
     xsave       [backup]
     ;==== End State Component Backup ========
+
+    ; Ask for the user's name
+    mov         rax, 0
+    mov         rdi, string_format
+    mov         rsi, name_prompt_message
+    call        printf
+
+    ; Receive input (representing the user's name) through
+    ; using fgets, trimming the newline with strlen
+    mov         rax, 0
+    mov         rdi, name
+    mov         rsi, 32
+    mov         rdx, [stdin]
+    call        fgets
+
+    mov         rax, 0
+    mov         rdi, name
+    call        strlen
+
+    mov         byte [name + rax - 1], 0
+
+    ; Ask for the user's title
+    mov         rax, 0
+    mov         rdi, string_format
+    mov         rsi, title_prompt_message
+    call        printf
+
+    ; Receive input (representing the user's title) through
+    ; using fgets, trimming the newline with strlen
+    mov         rax, 0
+    mov         rdi, title
+    mov         rsi, 40
+    mov         rdx, [stdin]
+    call        fgets
+
+    mov         rax, 0
+    mov         rdi, title
+    call        strlen
+
+    mov         byte [title + rax - 1], 0
+
+    ; Welcome the user given their title and their title
+    mov         rax, 0
+    mov         rdi, string_format
+    mov         rsi, welcome_message
+    call        printf
 
     ; Prompt for the speed of the intial segment of the trip
     mov qword   rax, 0
