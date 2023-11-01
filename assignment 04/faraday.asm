@@ -120,11 +120,6 @@ faraday:
     mov         rsi, voltage_prompt_message
     call        printf
 
-    ; mov qword   rax, 0
-    ; mov         rdi, eight_byte_format
-    ; mov         rsi, rsp
-    ; call        scanf
-    ; movsd       xmm8, qword [rsp]
     mov         rax, 0
     mov         rdi, num
     mov         rsi, 40
@@ -134,10 +129,10 @@ faraday:
     ; Strip the newline character by getting the string's length
     ; and removing the last character of the string
     mov         rax, 0
-    mov         rdi, title
+    mov         rdi, num
     call        strlen
 
-    mov         byte [title + rax - 1], 0
+    mov         byte [num + rax - 1], byte 0
 
     ; Validate that the input is a floating-point number
     mov         rax, 0
@@ -157,11 +152,31 @@ faraday:
     mov         rsi, resistance_prompt_message
     call        printf
 
-    mov qword   rax, 0
-    mov         rdi, eight_byte_format
-    mov         rsi, rsp
-    call        scanf
-    movsd       xmm9, qword [rsp]
+    mov         rax, 0
+    mov         rdi, num
+    mov         rsi, 40
+    mov         rdx, [stdin]
+    call        fgets
+
+    ; Strip the newline character by getting the string's length
+    ; and removing the last character of the string
+    mov         rax, 0
+    mov         rdi, num
+    call        strlen
+
+    mov         byte [num + rax - 1], byte 0
+
+    ; Validate that the input is a floating-point number
+    mov         rax, 0
+    mov         rdi, num
+    call        isfloat
+    cmp         rax, 0
+    je          invalid
+
+    mov         rax, 0
+    mov         rdi, num
+    call        atof
+    movsd       xmm9, xmm0
 
     ; Prompt for the time that the system has been operating for
     mov qword   rax, 0
@@ -169,11 +184,31 @@ faraday:
     mov         rsi, time_prompt_message
     call        printf
 
-    mov qword   rax, 0
-    mov         rdi, eight_byte_format
-    mov         rsi, rsp
-    call        scanf
-    movsd       xmm10, qword [rsp]
+    mov         rax, 0
+    mov         rdi, num
+    mov         rsi, 40
+    mov         rdx, [stdin]
+    call        fgets
+
+    ; Strip the newline character by getting the string's length
+    ; and removing the last character of the string
+    mov         rax, 0
+    mov         rdi, num
+    call        strlen
+
+    mov         byte [num + rax - 1], byte 0
+
+    ; Validate that the input is a floating-point number
+    mov         rax, 0
+    mov         rdi, num
+    call        isfloat
+    cmp         rax, 0
+    je          invalid
+
+    mov         rax, 0
+    mov         rdi, num
+    call        atof
+    movsd       xmm10, xmm0
 
     ; xmm8 = V, xmm9 = R, xmm10 = T
     ; xmm11 = V / R = I
