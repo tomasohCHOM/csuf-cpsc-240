@@ -149,7 +149,7 @@ greater_than_or_equal_to_miles:
 
 setreturnvalue:
     sub         rsp, 8
-    movsd       qword [rsp], xmm14
+    movsd       qword [rsp], xmm12
 
     ;==== Perform State Component Restore ====
     mov         rax, 7
@@ -157,10 +157,10 @@ setreturnvalue:
     xrstor      [backup]
     ;==== End State Component Restore ========
 
-    movsd       xmm14, qword [rsp]
+    movsd       xmm12, qword [rsp]
     add         rsp, 8
 
-    movsd       xmm0, xmm14     ; Save the total time in xmm0 to return
+    movsd       xmm0, xmm12
     ; Restoring the original value to the GPRs
     popf
     pop        r15
