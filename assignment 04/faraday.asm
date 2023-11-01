@@ -3,10 +3,17 @@
 ; Begin code area
 extern printf       ; external C++ function to write to standard output
 extern scanf        ; external C++ function to read from standard input
+extern fgets
+extern strlen
+extern atof
+extern isfloat
+
 global faraday
 
 segment .data
     ; Declare some messages to the users
+    name_prompt_message         db "Please enter your name: ", 0
+    title_prompt_message        db "Please enter your title or profession: ", 0
     welcome_message             db "We always welcome a card player to our electrical lab.", 10, 0
     voltage_prompt_message      db "Please enter the voltage of the electrical system at your site (volts): ", 0
     resistance_prompt_message   db "Please enter the electrical resistance in the system at your site (ohms): ", 0
@@ -25,6 +32,11 @@ segment .data
     string_format       db "%s", 0
     eight_byte_format   db "%lf", 0
 
+segment .bss
+    align   64
+    backup  resb 832
+    name    resb 32
+    title   resb 40
 
 ; Begin executable instructions
 segment .text
@@ -48,6 +60,12 @@ faraday:
     push    r15
     pushf
 
+    ;==== Perform State Component Backup ====
+    mov         rax, 7
+    mov         rdx, 0
+    xsave       [backup]
+    ;==== End State Component Backup ========
+
     ; Prompt for the speed of the intial segment of the trip
     mov qword   rax, 0
     mov         rdi, string_format
@@ -59,9 +77,7 @@ faraday:
     mov         rdi, eight_byte_format
     mov         rsi, rsp
     call        scanf
-    movsd       xmm8, [rsp]
-    ucomisd     xmm8, xmm12     ; compare to xmm12 which is equal to 0
-    jbe         negative        ; jump to the negative section if input < 0
+    movsd       xmm8, qword [rsp]
 
     ; Prompt for the number of miles that the speed will be maintained
     mov qword   rax, 0
@@ -74,12 +90,7 @@ faraday:
     mov         rdi, eight_byte_format
     mov         rsi, rsp
     call        scanf
-    movsd       xmm9, [rsp]
-    ucomisd     xmm9, xmm12     ; compare the value to zero (xmm13 = 0)
-    jbe         negative        ; jump to the negative section if input < 0
-    movsd       xmm15, qword [two_hundred_fifty_three_point_five]
-    ucomisd     xmm9, xmm15
-    jae         greater_than_or_equal_to_miles
+    movsd       xmm9, qword [rsp]
 
     ; Prompt for the speed of the final segment of the trip
     mov qword   rax, 0
@@ -92,31 +103,18 @@ faraday:
     mov         rdi, eight_byte_format
     mov         rsi, rsp
     call        scanf
-    movsd       xmm10, [rsp]
-    ucomisd     xmm10, xmm12     ; compare the value to zero (xmm12 = 0)
-    jbe         negative        ; jump to the negative section if input < 0
+    movsd       xmm10, qword [rsp]
 
-    ; We have x initial speed and it is maintained for the first y miles
-    ; The number of hours passed is equal to y / x
-    movsd       xmm11, xmm9
-    divsd       xmm11, xmm8     ; xmm11 = y / x in hours
-
-    movsd       xmm12, qword [two_hundred_fifty_three_point_five]
-    subsd       xmm12, xmm9     ; xmm12 = distance - miles (2nd input)
-
+    movsd       xmm11, xmm8
+    divsd       xmm11, xmm9
+    movsd       xmm12, xmm8
+    mulsd       xmm12, xmm11
     movsd       xmm13, xmm12
-    divsd       xmm13, xmm10    ; xmm13 = remaining distance / final speed in hours
-
-    movsd       xmm14, xmm11    ; initial time
-    addsd       xmm14, xmm13    ; total time = xmm14 + xmm13
-
-    movsd       xmm15, qword [two_hundred_fifty_three_point_five]
-    divsd       xmm15, xmm14    ; average speed in the entire trip
-    movsd       [rsp], xmm15
+    mulsd       xmm12, xmm10
 
     mov         rax, 1
     mov         rdi, calculation_message
-    movsd       xmm0, xmm15
+    movsd       xmm0, xmm12
     call        printf
 
     mov         rax, 0
@@ -150,6 +148,18 @@ greater_than_or_equal_to_miles:
     jmp         setreturnvalue
 
 setreturnvalue:
+    sub         rsp, 8
+    movsd       qword [rsp], xmm14
+
+    ;==== Perform State Component Restore ====
+    mov         rax, 7
+    mov         rdx, 0
+    xrstor      [backup]
+    ;==== End State Component Restore ========
+
+    movsd       xmm14, qword [rsp]
+    add         rsp, 8
+
     movsd       xmm0, xmm14     ; Save the total time in xmm0 to return
     ; Restoring the original value to the GPRs
     popf
