@@ -78,7 +78,7 @@ output_array:
 
     mov         rax, 1
     mov         rdi, num
-    movsd       xmm0, xmm8
+    movsd       xmm0, xmm9
     call        printf
 
     ; Get the clock
