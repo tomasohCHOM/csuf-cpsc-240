@@ -5,14 +5,24 @@
 
 ;Declarations
 extern printf
+extern scanf
 global output_array
 
 segment .data
-    output_format db "0x%016lx = %.7E", 10, 0
+    delay_input_message   db "What is the delay time that you prefer (seconds)? ", 0
+    cpu_frequency_message db "What is the maximum frequency of your cpu (GHz)? ", 0
+    output_format         db "0x%016lx = %.7E", 10, 0
+
+    num db "The number is %lf", 10, 0
+
+    string_format         db "%s", 0
+    floatform             db "%lf", 0
 
 segment .bss
     align 64
-    storedata resb 832
+    storedata     resb 832
+    input_time    resq 1
+    cpu_frequency resq 1
 
 segment .text
 
@@ -44,6 +54,42 @@ output_array:
     mov         r14, rdi     ; rdi contains the array
     mov         r15, rsi     ; rsi contains the count of the array
 
+    mov         rax, 0
+    mov         rdi, string_format
+    mov         rsi, delay_input_message
+    call        printf
+
+    mov         rax, 0
+    mov         rsi, input_time
+    mov         rdi, floatform
+    call        scanf
+    movsd       xmm8, qword [input_time]
+
+    mov         rax, 0
+    mov         rdi, string_format
+    mov         rsi, cpu_frequency_message
+    call        printf
+
+    mov         rax, 0
+    mov         rsi, cpu_frequency
+    mov         rdi, floatform
+    call        scanf
+    movsd       xmm9, qword [cpu_frequency]
+
+    mov         rax, 1
+    mov         rdi, num
+    movsd       xmm0, xmm8
+    call        printf
+
+    ; Get the clock
+    xor         rax, rax
+    xor         rdx, rdx
+    cpuid
+    rdtsc
+    shl         rdx, 32
+    or          rax, rdx
+    mov         r12, rax
+
 output_loop:
     ; If the index reach the count, end the loop
     cmp         r13, r15
@@ -57,8 +103,13 @@ output_loop:
     call        printf   
 
     ; Inrease the index and repeat the loop
-    inc         r13      
+    inc         r13
     jmp         output_loop
+
+
+delay:
+    movsd       xmm10, xmm8
+    mulsd       xmm10, xmm9
 
 output_finished:
     ; Restore all the floating-point numbers
